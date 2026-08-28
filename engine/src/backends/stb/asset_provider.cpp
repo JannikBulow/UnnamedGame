@@ -16,11 +16,31 @@ namespace backend {
         int height = 0;
         int channels = 0;
 
-        stbi_uc* data = stbi_load(path, &width, &height, &channels, 4);
+        constexpr int DesiredChannels = 4;
+
+        stbi_uc* data = stbi_load(path, &width, &height, &channels, DesiredChannels);
         if (!data) {
             throw util::GameException();
         }
+
+        size_t pixelCount = static_cast<size_t>(width) * static_cast<size_t>(height);
+        size_t byteCount = pixelCount * DesiredChannels;
+
+        unsigned char* pixels = new unsigned char[byteCount];
+
+        Image image = {
+            .width = width,
+            .height = height,
+            .pixels = pixels,
+        };
+        std::memcpy(pixels, data, byteCount);
+
+        stbi_image_free(data);
+
+        return image;
     }
 
-    void StbAssetProvider::unloadImage(Image image) {}
+    void StbAssetProvider::unloadImage(Image image) {
+        delete[] image.pixels;
+    }
 }
