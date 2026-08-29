@@ -122,8 +122,8 @@ namespace math {
 
         T x, y;
 
-        Vec2T() = default;
-        Vec2T(T x, T y) : x(x), y(y) {}
+        constexpr Vec2T() = default;
+        constexpr Vec2T(T x, T y) : x(x), y(y) {}
 
         static constexpr Vec2T Zero() { return {0, 0}; }
         static constexpr Vec2T One() { return {1, 1}; }
@@ -224,7 +224,7 @@ namespace math {
         static constexpr int Rows = R;
         static constexpr int Cols = C;
 
-        MatrixT() = default;
+        constexpr MatrixT() = default;
 
         static constexpr MatrixT Zero() {
             MatrixT result;
