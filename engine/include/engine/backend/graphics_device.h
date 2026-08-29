@@ -49,6 +49,16 @@ namespace backend {
         int offset;
     };
 
+    enum class TextureFilter {
+        Nearest,
+        Linear,
+    };
+
+    enum class TextureWrap {
+        Clamp,
+        Repeat,
+    };
+
     struct DrawCommand {
         PrimitiveType primitive = PrimitiveType::Triangles;
 
@@ -100,6 +110,8 @@ namespace backend {
         virtual TextureHandle createTexture(Image image) = 0;
         virtual void destroyTexture(TextureHandle texture) = 0;
         virtual void bindTexture(unsigned slot, TextureHandle texture) = 0;
+        virtual void setTextureFilter(TextureHandle texture, TextureFilter filter) = 0;
+        virtual void setTextureWrap(TextureHandle texture, TextureWrap wrap) = 0;
 
         virtual void setBlendMode(BlendMode mode) = 0;
 

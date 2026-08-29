@@ -196,6 +196,24 @@ namespace backend {
         glBindTexture(GL_TEXTURE_2D, id);
     }
 
+    void OpenGLGraphicsDevice::setTextureFilter(TextureHandle texture, TextureFilter filter) {
+        GLuint id = mTextures.get(texture);
+        glBindTexture(GL_TEXTURE_2D, id);
+
+        GLint glFilter = ToGLFilter(filter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glFilter);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glFilter);
+    }
+
+    void OpenGLGraphicsDevice::setTextureWrap(TextureHandle texture, TextureWrap wrap) {
+        GLuint id = mTextures.get(texture);
+        glBindTexture(GL_TEXTURE_2D, id);
+
+        GLint glWrap = ToGLWrap(wrap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glWrap);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glWrap);
+    }
+
     void OpenGLGraphicsDevice::setBlendMode(BlendMode mode) {
         switch (mode) {
             case BlendMode::None:
@@ -259,6 +277,26 @@ namespace backend {
                 return GL_UNSIGNED_BYTE;
         }
         return GL_FLOAT;
+    }
+
+    int OpenGLGraphicsDevice::ToGLFilter(TextureFilter filter) {
+        switch (filter) {
+            case TextureFilter::Nearest:
+                return GL_NEAREST;
+            case TextureFilter::Linear:
+                return GL_LINEAR;
+        }
+        return GL_LINEAR;
+    }
+
+    int OpenGLGraphicsDevice::ToGLWrap(TextureWrap wrap) {
+        switch (wrap) {
+            case TextureWrap::Repeat:
+                return GL_REPEAT;
+            case TextureWrap::Clamp:
+                return GL_CLAMP_TO_EDGE;
+        }
+        return GL_REPEAT;
     }
 
     uint OpenGLGraphicsDevice::CompileShader(uint type, const char* source) {

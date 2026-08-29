@@ -40,6 +40,8 @@ namespace backend {
         TextureHandle createTexture(Image image) override;
         void destroyTexture(TextureHandle texture) override;
         void bindTexture(unsigned slot, TextureHandle texture) override;
+        void setTextureFilter(TextureHandle texture, TextureFilter filter) override;
+        void setTextureWrap(TextureHandle texture, TextureWrap wrap) override;
 
         void setBlendMode(BlendMode mode) override;
 
@@ -58,6 +60,8 @@ namespace backend {
         static uint ToGLPrimitive(PrimitiveType primitive);
         static uint ToGLUsage(BufferUsage usage);
         static uint ToGLVertexAttributeType(VertexAttributeType type);
+        static int ToGLFilter(TextureFilter filter);
+        static int ToGLWrap(TextureWrap wrap);
 
         static uint CompileShader(uint type, const char* source);
         static uint CreateShaderProgram(uint vertexShader, uint fragmentShader);
