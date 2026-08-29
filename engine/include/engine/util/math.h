@@ -7,22 +7,26 @@
 #include <cmath>
 
 namespace math {
-    struct Color4F {
-        float r, g, b, a;
-
-        Color4F() = default;
-        Color4F(float r, float g, float b) : r(r), g(g), b(b), a(1.0f) {}
-        Color4F(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
-
-        struct Color4B toColor4B() const;
-    };
-
     struct Color4B {
+        static const Color4B Black;
+        static const Color4B White;
+        static const Color4B Transparent;
+        static const Color4B DarkGray;
+        static const Color4B Gray;
+        static const Color4B LightGray;
+        static const Color4B Red;
+        static const Color4B Green;
+        static const Color4B Blue;
+        static const Color4B Yellow;
+        static const Color4B Cyan;
+        static const Color4B Magenta;
+        static const Color4B Orange;
+        static const Color4B Purple;
+        static const Color4B Teal;
         unsigned char r, g, b, a;
 
-        Color4B() = default;
-        Color4B(unsigned char r, unsigned char g, unsigned char b) : r(r), g(g), b(b), a(255) {}
-        Color4B(unsigned char r, unsigned char g, unsigned char b, unsigned char a) : r(r), g(g), b(b), a(a) {}
+        constexpr Color4B() = default;
+        constexpr Color4B(unsigned char r, unsigned char g, unsigned char b, unsigned char a = 255) : r(r), g(g), b(b), a(a) {}
 
         constexpr int rgb() const {
             return (0xFF << 24) | (r << 16) | (g << 8) | b;
@@ -32,10 +36,35 @@ namespace math {
             return (a << 24) | (r << 16) | (g << 8) | b;
         }
 
-        Color4F toColor4F() const;
+        explicit constexpr operator struct Color4F() const;
     };
 
-    inline Color4B Color4F::toColor4B() const {
+    struct Color4F {static const Color4F Black;
+        static const Color4F White;
+        static const Color4F Transparent;
+        static const Color4F DarkGray;
+        static const Color4F Gray;
+        static const Color4F LightGray;
+        static const Color4F Red;
+        static const Color4F Green;
+        static const Color4F Blue;
+        static const Color4F Yellow;
+        static const Color4F Cyan;
+        static const Color4F Magenta;
+        static const Color4F Orange;
+        static const Color4F Purple;
+        static const Color4F Teal;
+
+        float r, g, b, a;
+
+        constexpr Color4F() = default;
+        constexpr Color4F(float r, float g, float b) : r(r), g(g), b(b), a(1.0f) {}
+        constexpr Color4F(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
+
+        explicit constexpr operator struct Color4B() const;
+    };
+
+    constexpr Color4F::operator Color4B() const {
         return {
             static_cast<unsigned char>(r * 255),
             static_cast<unsigned char>(g * 255),
@@ -44,7 +73,7 @@ namespace math {
         };
     }
 
-    inline Color4F Color4B::toColor4F() const {
+    constexpr Color4B::operator Color4F() const {
         return {
             static_cast<float>(r) / 255.0f,
             static_cast<float>(g) / 255.0f,
@@ -52,6 +81,38 @@ namespace math {
             static_cast<float>(a) / 255.0f,
         };
     }
+
+    constexpr Color4B Color4B::Black{0, 0, 0};
+    constexpr Color4B Color4B::White{255, 255, 255};
+    constexpr Color4B Color4B::Transparent{0, 0, 0, 0};
+    constexpr Color4B Color4B::DarkGray{32, 32, 32};
+    constexpr Color4B Color4B::Gray{128, 128, 128};
+    constexpr Color4B Color4B::LightGray{200, 200, 200};
+    constexpr Color4B Color4B::Red{255, 0, 0};
+    constexpr Color4B Color4B::Green{0, 255, 0};
+    constexpr Color4B Color4B::Blue{0, 0, 255};
+    constexpr Color4B Color4B::Yellow{255, 255, 0};
+    constexpr Color4B Color4B::Cyan{0, 255, 255};
+    constexpr Color4B Color4B::Magenta{255, 0, 255};
+    constexpr Color4B Color4B::Orange{255, 128, 0};
+    constexpr Color4B Color4B::Purple{128, 0, 255};
+    constexpr Color4B Color4B::Teal{0, 128, 128};
+
+    constexpr Color4F Color4F::Black{Color4B::Black};
+    constexpr Color4F Color4F::White{Color4B::White};
+    constexpr Color4F Color4F::Transparent{Color4B::Transparent};
+    constexpr Color4F Color4F::DarkGray{Color4B::DarkGray};
+    constexpr Color4F Color4F::Gray{Color4B::Gray};
+    constexpr Color4F Color4F::LightGray{Color4B::LightGray};
+    constexpr Color4F Color4F::Red{Color4B::Red};
+    constexpr Color4F Color4F::Green{Color4B::Green};
+    constexpr Color4F Color4F::Blue{Color4B::Blue};
+    constexpr Color4F Color4F::Yellow{Color4B::Yellow};
+    constexpr Color4F Color4F::Cyan{Color4B::Cyan};
+    constexpr Color4F Color4F::Magenta{Color4B::Magenta};
+    constexpr Color4F Color4F::Orange{Color4B::Orange};
+    constexpr Color4F Color4F::Purple{Color4B::Purple};
+    constexpr Color4F Color4F::Teal{Color4B::Teal};
 
     using Color = Color4B;
 

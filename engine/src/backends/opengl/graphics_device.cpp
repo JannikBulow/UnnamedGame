@@ -20,7 +20,7 @@ namespace backend {
     }
 
     void OpenGLGraphicsDevice::clear(math::Color color) {
-        math::Color4F fcolor = color.toColor4F();
+        math::Color4F fcolor(color);
         glClearColor(fcolor.r, fcolor.g, fcolor.b, fcolor.a);
         glClear(GL_COLOR_BUFFER_BIT);
     }
@@ -152,7 +152,7 @@ namespace backend {
     }
 
     void OpenGLGraphicsDevice::setUniform(UniformHandle uniform, math::Color4B value) {
-        math::Color4F fcolor = value.toColor4F();
+        math::Color4F fcolor(value);
         GLint id = mUniforms.get(uniform);
         glUniform4f(id, fcolor.r, fcolor.g, fcolor.b, fcolor.a);
     }
