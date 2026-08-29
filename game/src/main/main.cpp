@@ -1,5 +1,6 @@
 // Copyright 2026 Jannik Laugmand Bülow
 
+#include <engine/backends/glfw/input_provider.h>
 #include <engine/backends/glfw/window.h>
 
 #include <engine/backends/opengl/renderer.h>
@@ -12,10 +13,11 @@
 #include <iostream>
 
 int main() {
-    backend::StbAssetProvider assetProvider;
     backend::GLFWWindow window(100, 100, "SWINGALING");
+    backend::GLFWInputProvider inputProvider(window);
     backend::OpenGLGraphicsDevice device;
     backend::OpenGLRenderer renderer(device, window);
+    backend::StbAssetProvider assetProvider;
 
     backend::Image ratImage = assetProvider.loadImage("/home/jannik/Downloads/rat.png");
     backend::TextureHandle rat = device.createTexture(ratImage);
@@ -35,10 +37,13 @@ int main() {
 
         window.pollEvents();
 
-        playerPosition.y += 1 * dt;
+        if (inputProvider.isKeyDown(backend::Key::W)) playerPosition.y += 10 * dt;
+        if (inputProvider.isKeyDown(backend::Key::S)) playerPosition.y -= 10 * dt;
+        if (inputProvider.isKeyDown(backend::Key::A)) playerPosition.x -= 10 * dt;
+        if (inputProvider.isKeyDown(backend::Key::D)) playerPosition.x += 10 * dt;
 
         renderer.beginFrame();
-        renderer.clearScreen(math::Color(255, 255, 255, 255));
+        renderer.clearScreen(math::Color(0, 0, 0));
 
         renderer.beginWorld(camera);
 
