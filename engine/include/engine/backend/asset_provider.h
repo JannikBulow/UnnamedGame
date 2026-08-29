@@ -19,7 +19,7 @@ namespace backend {
         int width;
         int height;
         ImageFormat format;
-        const uint8_t* pixels;
+        uint8_t* pixels;
     };
 
     struct Glyph {
