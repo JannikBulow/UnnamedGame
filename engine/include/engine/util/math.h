@@ -210,8 +210,8 @@ namespace math {
     struct RectT {
         T left, right, top, bottom;
 
-        RectT() = default;
-        RectT(T left, T right, T top, T bottom) : left(left), right(right), top(top), bottom(bottom) {}
+        constexpr RectT() = default;
+        constexpr RectT(T left, T right, T top, T bottom) : left(left), right(right), top(top), bottom(bottom) {}
     };
 
     using RectI = RectT<int>;
