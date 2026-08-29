@@ -16,21 +16,37 @@ namespace backend {
         int height = 0;
         int channels = 0;
 
-        constexpr int DesiredChannels = 4;
-
-        stbi_uc* data = stbi_load(path, &width, &height, &channels, DesiredChannels);
+        stbi_uc* data = stbi_load(path, &width, &height, &channels, 0);
         if (!data) {
-            throw util::GameException();
+            throw util::GameException(stbi_failure_reason());
+        }
+
+        ImageFormat format;
+        switch (channels) {
+            case 1:
+                format = ImageFormat::R8;
+                break;
+            case 3:
+                format = ImageFormat::RGB8;
+                break;
+            case 4:
+                format = ImageFormat::RGBA8;
+                break;
+
+            default:
+                stbi_image_free(data);
+                throw util::GameException("unsupported image format");
         }
 
         size_t pixelCount = static_cast<size_t>(width) * static_cast<size_t>(height);
-        size_t byteCount = pixelCount * DesiredChannels;
+        size_t byteCount = pixelCount * channels;
 
         unsigned char* pixels = new unsigned char[byteCount];
 
         Image image = {
             .width = width,
             .height = height,
+            .format = format,
             .pixels = pixels,
         };
         std::memcpy(pixels, data, byteCount);

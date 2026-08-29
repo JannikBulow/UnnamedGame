@@ -6,10 +6,16 @@
 #include <cstdint>
 
 namespace backend {
-    // rgba8
+    enum class ImageFormat {
+        R8,
+        RGB8,
+        RGBA8,
+    };
+
     struct Image {
         int width;
         int height;
+        ImageFormat format;
         const uint8_t* pixels;
     };
 
