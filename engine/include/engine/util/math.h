@@ -4,6 +4,7 @@
 #define UNNAMEDGAME_ENGINE_UTIL_MATH_H
 
 #include <array>
+#include <cmath>
 
 namespace math {
     struct Color4F {
@@ -195,6 +196,20 @@ namespace math {
 
             result(0, N - 1) = vec.x;
             result(1, N - 1) = vec.y;
+
+            return result;
+        }
+
+        static constexpr MatrixT RotationZ(T rads) requires(Rows == Cols && Rows >= 3) {
+            MatrixT result = Identity();
+
+            T c = std::cos(rads);
+            T s = std::sin(rads);
+
+            result(0, 0) = c;
+            result(0, 1) = -s;
+            result(1, 0) = s;
+            result(1, 1) = c;
 
             return result;
         }
