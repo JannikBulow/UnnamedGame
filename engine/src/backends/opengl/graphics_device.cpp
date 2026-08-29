@@ -153,14 +153,29 @@ namespace backend {
         glGenTextures(1, &texture);
         glBindTexture(GL_TEXTURE_2D, texture);
 
-        GLenum internalFormat = GL_RGBA8;
-        GLenum sourceFormat = GL_RGBA;
+        GLint internalFormat;
+        GLenum format;
 
-        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, sourceFormat, GL_UNSIGNED_BYTE, image.pixels);
+        switch (image.format) {
+            case ImageFormat::R8:
+                internalFormat = GL_R8;
+                format = GL_RED;
+                break;
+            case ImageFormat::RGB8:
+                internalFormat = GL_RGB8;
+                format = GL_RGB;
+                break;
+            case ImageFormat::RGBA8:
+                internalFormat = GL_RGBA8;
+                format = GL_RGBA;
+                break;
+            default:
+                throw util::GameException("unreachable");
+        }
+
+        glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, format, GL_UNSIGNED_BYTE, image.pixels);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
         return mTextures.create(texture);
     }
