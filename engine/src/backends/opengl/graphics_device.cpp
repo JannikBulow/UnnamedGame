@@ -38,6 +38,7 @@ namespace backend {
     void OpenGLGraphicsDevice::destroyBuffer(BufferHandle buffer) {
         GLuint vbo = mBuffers.get(buffer);
         glDeleteBuffers(1, &vbo);
+        mBuffers.destroy(buffer);
     }
 
     void OpenGLGraphicsDevice::updateBuffer(BufferHandle buffer, size_t offset, size_t size, const void* data) {
@@ -55,6 +56,7 @@ namespace backend {
     void OpenGLGraphicsDevice::destroyVertexArray(VertexArrayHandle vertexArray) {
         GLuint vao = mVertexArrays.get(vertexArray);
         glDeleteVertexArrays(1, &vao);
+        mVertexArrays.destroy(vertexArray);
     }
 
     void OpenGLGraphicsDevice::bindVertexArray(VertexArrayHandle vertexArray) {
@@ -106,6 +108,7 @@ namespace backend {
     void OpenGLGraphicsDevice::destroyShader(ShaderHandle shader) {
         GLuint program = mShaders.get(shader);
         glDeleteProgram(program);
+        mShaders.destroy(shader);
     }
 
     void OpenGLGraphicsDevice::bindShader(ShaderHandle shader) {
@@ -186,6 +189,7 @@ namespace backend {
     void OpenGLGraphicsDevice::destroyTexture(TextureHandle texture) {
         GLuint id = mTextures.get(texture);
         glDeleteTextures(1, &id);
+        mTextures.destroy(texture);
     }
 
     void OpenGLGraphicsDevice::bindTexture(unsigned slot, TextureHandle texture) {
