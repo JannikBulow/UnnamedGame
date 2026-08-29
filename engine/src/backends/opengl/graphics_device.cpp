@@ -231,15 +231,6 @@ namespace backend {
         glDrawArrays(ToGLPrimitive(command.primitive), static_cast<GLint>(command.firstVertex), static_cast<GLsizei>(command.vertexCount));
     }
 
-    void OpenGLGraphicsDevice::drawIndexed(DrawIndexedCommand command) {
-        glDrawElements(
-        ToGLPrimitive(command.primitive),
-        static_cast<GLsizei>(command.indexCount),
-        GL_UNSIGNED_INT,
-        reinterpret_cast<const void*>(static_cast<std::uintptr_t>(command.firstIndex * sizeof(uint32_t)))
-    );
-    }
-
     uint OpenGLGraphicsDevice::ToGLPrimitive(PrimitiveType primitive) {
         switch (primitive) {
             case PrimitiveType::Triangles:

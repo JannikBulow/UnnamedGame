@@ -46,7 +46,6 @@ namespace backend {
         void setBlendMode(BlendMode mode) override;
 
         void draw(DrawCommand command) override;
-        void drawIndexed(DrawIndexedCommand command) override;
 
     private:
         using uint = unsigned int;

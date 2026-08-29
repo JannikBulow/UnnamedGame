@@ -66,14 +66,6 @@ namespace backend {
         uint32_t firstVertex = 0;
     };
 
-    struct DrawIndexedCommand {
-        PrimitiveType primitive = PrimitiveType::Triangles;
-
-        uint32_t indexCount = 0;
-        uint32_t firstIndex = 0;
-        int32_t vertexOffset = 0;
-    };
-
     class IGraphicsDevice {
     public:
         virtual ~IGraphicsDevice() = default;
@@ -116,7 +108,6 @@ namespace backend {
         virtual void setBlendMode(BlendMode mode) = 0;
 
         virtual void draw(DrawCommand command) = 0;
-        virtual void drawIndexed(DrawIndexedCommand command) = 0;
     };
 }
 
