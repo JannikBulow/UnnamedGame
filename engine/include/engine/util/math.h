@@ -278,6 +278,14 @@ namespace math {
         lhs *= rhs;
         return lhs;
     }
+
+
+    constexpr double PI = 3.14159265358979323846;
+
+    template<class T>
+    constexpr T rads(T degs) {
+        return degs * (PI / 180.0);
+    }
 }
 
 #endif //UNNAMEDGAME_ENGINE_UTIL_MATH_H
