@@ -43,7 +43,7 @@ int main() {
         if (inputProvider.isKeyDown(backend::Key::D)) playerPosition.x += 10 * dt;
 
         renderer.beginFrame();
-        renderer.clearScreen(math::Color(0, 0, 0));
+        renderer.clearScreen(math::Color::White);
 
         renderer.beginWorld(camera);
 
