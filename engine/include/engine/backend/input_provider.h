@@ -7,6 +7,8 @@
 
 namespace backend {
     enum class Key {
+        Unknown = 0,
+
         One,
         Two,
         Three,
@@ -17,6 +19,7 @@ namespace backend {
         Eight,
         Nine,
         Zero,
+
         A,
         B,
         C,
@@ -43,6 +46,9 @@ namespace backend {
         X,
         Y,
         Z,
+
+
+        _keyCount
     };
 
     class IInputProvider {
