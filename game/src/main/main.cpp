@@ -3,14 +3,21 @@
 #include <engine/backends/opengl/renderer.h>
 #include <engine/backends/opengl/graphics_device.h>
 
+#include <engine/backends/stb/asset_provider.h>
+
 #include <engine/util/timer.h>
 
 #include <iostream>
 
 int main() {
+    backend::StbAssetProvider assetProvider;
     backend::GLFWWindow window(100, 100, "SWINGALING");
     backend::OpenGLGraphicsDevice device;
     backend::OpenGLRenderer renderer(device, window);
+
+    backend::Image ratImage = assetProvider.loadImage("/home/jannik/Downloads/rat.png");
+    backend::TextureHandle rat = device.createTexture(ratImage);
+    assetProvider.unloadImage(ratImage);
 
     util::Timer<std::chrono::steady_clock> timer;
     timer.setLimit(165);
@@ -29,14 +36,15 @@ int main() {
         playerPosition.y += 1 * dt;
 
         renderer.beginFrame();
-        renderer.clearScreen(math::Color(0, 0, 0, 255));
+        renderer.clearScreen(math::Color(255, 255, 255, 255));
 
         renderer.beginWorld(camera);
 
-        renderer.drawRect({
-            playerPosition,
-            {1, 1},
-            {255, 255, 255, 255}
+        renderer.drawTexture({
+            .texture = rat,
+            .position = playerPosition,
+            .size = {1, 1},
+            .color = {255, 255, 255, 255}
         });
 
         renderer.endWorld();
