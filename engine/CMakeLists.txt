@@ -71,9 +71,10 @@ endif()
 find_package(OpenGL REQUIRED)
 
 set(SOURCES
+    src/backends/glfw/window.cpp
+
     src/backends/opengl/graphics_device.cpp
     src/backends/opengl/renderer.cpp
-    src/backends/opengl/window.cpp
 
     src/backends/stb/asset_provider.cpp
 
@@ -81,22 +82,24 @@ set(SOURCES
 )
 
 set(HEADERS
+    include/engine/backends/glfw/window.h
+
     include/engine/backend/asset_provider.h
     include/engine/backend/graphics_device.h
+    include/engine/backend/input_provider.h
+    include/engine/backend/renderer.h
     include/engine/backend/window.h
 
+    include/engine/backends/opengl/graphics_device.h
     include/engine/backends/opengl/renderer.h
-    include/engine/backends/opengl/window.h
+    include/engine/backends/opengl/shader_programs.h
 
     include/engine/backends/stb/asset_provider.h
 
     include/engine/util/exceptions.h
     include/engine/util/handle.h
-    include/engine/util/resource_location.h
-    include/engine/backend/renderer.h
     include/engine/util/math.h
-    include/engine/backends/opengl/shader_programs.h
-    include/engine/backends/opengl/graphics_device.h
+    include/engine/util/resource_location.h
     include/engine/util/timer.h
 )
 

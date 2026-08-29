@@ -1,8 +1,9 @@
 // Copyright 2026 Jannik Laugmand Bülow
 
+#include <engine/backends/glfw/window.h>
+
 #include <engine/backends/opengl/renderer.h>
 #include <engine/backends/opengl/graphics_device.h>
-#include <engine/backends/opengl/window.h>
 
 #include <engine/backends/stb/asset_provider.h>
 

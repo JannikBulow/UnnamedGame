@@ -1,6 +1,6 @@
 // Copyright 2026 Jannik Laugmand Bülow
 
-#include "engine/backends/opengl/window.h"
+#include "../../../include/engine/backends/glfw/window.h"
 
 #include "engine/util/exceptions.h"
 
