@@ -175,6 +175,7 @@ namespace backend {
                 throw util::GameException("unreachable");
         }
 
+        glPixelStorei(GL_PACK_ALIGNMENT, 1);
         glTexImage2D(GL_TEXTURE_2D, 0, internalFormat, image.width, image.height, 0, format, GL_UNSIGNED_BYTE, image.pixels);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
