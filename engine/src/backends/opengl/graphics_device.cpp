@@ -113,7 +113,7 @@ namespace backend {
 
     void OpenGLGraphicsDevice::destroyShader(ShaderHandle shader) {
         GLuint program = mShaders.get(shader);
-        glDeleteShader(program);
+        glDeleteProgram(program);
     }
 
     void OpenGLGraphicsDevice::bindShader(ShaderHandle shader) {
