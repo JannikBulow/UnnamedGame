@@ -49,6 +49,10 @@ namespace backend {
         glfwPollEvents();
     }
 
+    void GLFWWindow::swapBuffers() {
+        glfwSwapBuffers(mWindow);
+    }
+
     math::Vec2I GLFWWindow::getFramebufferSize() const {
         math::Vec2I size;
         glfwGetFramebufferSize(mWindow, &size.x, &size.y);
@@ -59,9 +63,5 @@ namespace backend {
         math::Vec2I size;
         glfwGetWindowSize(mWindow, &size.x, &size.y);
         return size;
-    }
-
-    GLFWwindow* GLFWWindow::getHandle() const {
-        return mWindow;
     }
 }

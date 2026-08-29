@@ -12,6 +12,7 @@ namespace backend {
 
         virtual bool shouldClose() const = 0;
         virtual void pollEvents() = 0;
+        virtual void swapBuffers() = 0;
 
         virtual math::Vec2I getFramebufferSize() const = 0;
         virtual math::Vec2I getWindowSize() const = 0;

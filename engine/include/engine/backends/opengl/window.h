@@ -15,11 +15,10 @@ namespace backend {
 
         bool shouldClose() const override;
         void pollEvents() override;
+        void swapBuffers() override;
 
         math::Vec2I getFramebufferSize() const override;
         math::Vec2I getWindowSize() const override;
-
-        GLFWwindow* getHandle() const;
 
     private:
         GLFWwindow* mWindow;
