@@ -73,6 +73,7 @@ namespace backend {
         math::Vec2 position;
         math::Vec2 size;
         math::Color color;
+        float rotation = 0.0f; // rads
     };
 
     struct DrawTextureCommand {
