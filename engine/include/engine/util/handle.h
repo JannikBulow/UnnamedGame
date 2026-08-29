@@ -22,7 +22,7 @@ namespace util {
         Handle(uint32_t index, uint32_t generation) : index(index), generation(generation) {}
 
         bool operator==(std::nullptr_t) const { return index == 0xFFFFFFFF && generation == 0xFFFFFFFF; }
-        bool operator!=(std::nullptr_t) const { return index != 0xFFFFFFFF || generation != 0xFFFFFFFF; }
+        bool operator==(Handle other) const { return index == other.index && generation == other.generation; }
 
         explicit operator bool() const { return *this != nullptr; }
     };
