@@ -31,6 +31,7 @@ namespace backend {
         void bindShader(ShaderHandle shader) override;
 
         UniformHandle getUniform(ShaderHandle shader, const char* name) override;
+        void setUniform(UniformHandle uniform, int value) override;
         void setUniform(UniformHandle uniform, float value) override;
         void setUniform(UniformHandle uniform, math::Vec2F value) override;
         void setUniform(UniformHandle uniform, math::Mat4F value) override;

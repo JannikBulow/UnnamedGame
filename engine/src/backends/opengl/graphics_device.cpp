@@ -126,6 +126,11 @@ namespace backend {
         return mUniforms.create(glGetUniformLocation(program, name));
     }
 
+    void OpenGLGraphicsDevice::setUniform(UniformHandle uniform, int value) {
+        GLint id = mUniforms.get(uniform);
+        glUniform1i(id, value);
+    }
+
     void OpenGLGraphicsDevice::setUniform(UniformHandle uniform, float value) {
         GLint id = mUniforms.get(uniform);
         glUniform1f(id, value);
