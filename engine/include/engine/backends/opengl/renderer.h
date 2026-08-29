@@ -27,25 +27,41 @@ namespace backend {
 
         void drawRect(const DrawRectCommand& command) override;
 
+        void drawTexture(const DrawTextureCommand& command) override;
+
     private:
         using uint = unsigned int;
 
         IGraphicsDevice& mDevice;
         GLFWWindow& mWindow;
 
-        ShaderHandle mShader;
+        ShaderHandle mColorShader;
+
+        UniformHandle mColorProjectionUniform;
+        UniformHandle mColorViewUniform;
+        UniformHandle mColorModelUniform;
+        UniformHandle mColorColorUniform;
+
+        ShaderHandle mTextureShader;
+
+        UniformHandle mTextureProjectionUniform;
+        UniformHandle mTextureViewUniform;
+        UniformHandle mTextureModelUniform;
+        UniformHandle mTextureTransformUniform;
+        UniformHandle mTextureColorUniform;
+        UniformHandle mTextureSamplerUniform;
+
+
         VertexArrayHandle mRectVAO;
         BufferHandle mRectVBO;
 
-        UniformHandle mProjectionUniform;
-        UniformHandle mViewUniform;
-        UniformHandle mModelUniform;
-        UniformHandle mColorUniform;
+        VertexArrayHandle mTextureVAO;
+        BufferHandle mTextureVBO;
 
         void initGL();
         void createShaders();
         void createRectGeometry();
-
+        void createTextureGeometry();
     };
 }
 

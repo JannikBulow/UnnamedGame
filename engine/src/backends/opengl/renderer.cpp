@@ -9,7 +9,14 @@
 #include <GLFW/glfw3.h>
 #include <glad/gl.h>
 
+#include <cmath>
+
 namespace backend {
+    struct TextureVertex {
+        math::Vec2 position;
+        math::Vec2 uv;
+    };
+
     void APIENTRY GLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
     }
 
@@ -36,8 +43,8 @@ namespace backend {
             mDevice.destroyVertexArray(mRectVAO);
         }
 
-        if (mShader) {
-            mDevice.destroyShader(mShader);
+        if (mColorShader) {
+            mDevice.destroyShader(mColorShader);
         }
     }
 
@@ -61,9 +68,17 @@ namespace backend {
             static_cast<float>(frameBufferSize.y)
         };
 
-        mDevice.bindShader(mShader);
-        mDevice.setUniform(mProjectionUniform, camera.projectionMatrix(viewportSize));
-        mDevice.setUniform(mViewUniform, camera.viewMatrix());
+        math::Mat4 projection = camera.projectionMatrix(viewportSize);
+        math::Mat4 view = camera.viewMatrix();
+
+        mDevice.bindShader(mColorShader);
+        mDevice.setUniform(mColorProjectionUniform, projection);
+        mDevice.setUniform(mColorViewUniform, view);
+
+        mDevice.bindShader(mTextureShader);
+        mDevice.setUniform(mTextureProjectionUniform, projection);
+        mDevice.setUniform(mTextureViewUniform, view);
+
         mDevice.setBlendMode(BlendMode::Alpha);
     }
 
@@ -80,9 +95,9 @@ namespace backend {
             static_cast<float>(frameBufferSize.y)
         );
 
-        mDevice.bindShader(mShader);
-        mDevice.setUniform(mProjectionUniform, projection);
-        mDevice.setUniform(mViewUniform, math::Mat4::Identity());
+        mDevice.bindShader(mColorShader);
+        mDevice.setUniform(mColorProjectionUniform, projection);
+        mDevice.setUniform(mColorViewUniform, math::Mat4::Identity());
     }
 
     void OpenGLRenderer::endUI() {
@@ -96,12 +111,47 @@ namespace backend {
     void OpenGLRenderer::drawRect(const DrawRectCommand& command) {
         math::Mat4 model = math::Mat4::Translation(command.position) * math::Mat4::Scale(command.size);
 
-        mDevice.bindShader(mShader);
+        mDevice.bindShader(mColorShader);
 
-        mDevice.setUniform(mModelUniform, model);
-        mDevice.setUniform(mColorUniform, command.color);
+        mDevice.setUniform(mColorModelUniform, model);
+        mDevice.setUniform(mColorColorUniform, command.color);
 
         mDevice.bindVertexArray(mRectVAO);
+
+        mDevice.draw({
+            .primitive = PrimitiveType::Triangles,
+            .vertexCount = 6,
+            .firstVertex = 0
+        });
+    }
+
+    void OpenGLRenderer::drawTexture(const DrawTextureCommand& command) {
+        math::Mat4 model = math::Mat4::Translation(command.position) * math::Mat4::Scale(command.size);
+        math::Mat3 transform;
+
+        transform(0, 0) = command.uv.right - command.uv.left;
+        transform(0, 1) = 0.0f;
+        transform(0, 2) = command.uv.left;
+
+        transform(1, 0) = 0.0f;
+        transform(1, 1) = command.uv.top - command.uv.bottom;
+        transform(1, 2) = command.uv.bottom;
+
+        transform(2, 0) = 0.0f;
+        transform(2, 1) = 0.0f;
+        transform(2, 2) = 1.0f;
+
+        mDevice.bindShader(mTextureShader);
+
+        mDevice.setUniform(mTextureModelUniform, model);
+        mDevice.setUniform(mTextureTransformUniform, transform);
+        mDevice.setUniform(mTextureColorUniform, command.color);
+
+        mDevice.bindVertexArray(mTextureVAO);
+
+        mDevice.bindTexture(0, command.texture);
+
+        mDevice.setUniform(mTextureSamplerUniform, 0);
 
         mDevice.draw({
             .primitive = PrimitiveType::Triangles,
@@ -113,15 +163,26 @@ namespace backend {
     void OpenGLRenderer::initGL() {
         createShaders();
         createRectGeometry();
+        createTextureGeometry();
     }
 
     void OpenGLRenderer::createShaders() {
-        mShader = mDevice.createShader(shaders::Vertex, shaders::Fragment);
+        mColorShader = mDevice.createShader(shaders::ColorVertex, shaders::ColorFragment);
 
-        mProjectionUniform = mDevice.getUniform(mShader, "uProjection");
-        mViewUniform = mDevice.getUniform(mShader, "uView");
-        mModelUniform = mDevice.getUniform(mShader, "uModel");
-        mColorUniform = mDevice.getUniform(mShader, "uColor");
+        mColorProjectionUniform = mDevice.getUniform(mColorShader, "uProjection");
+        mColorViewUniform = mDevice.getUniform(mColorShader, "uView");
+        mColorModelUniform = mDevice.getUniform(mColorShader, "uModel");
+        mColorColorUniform = mDevice.getUniform(mColorShader, "uColor");
+
+
+        mTextureShader = mDevice.createShader(shaders::TextureVertex, shaders::TextureFragment);
+
+        mTextureProjectionUniform = mDevice.getUniform(mTextureShader, "uProjection");
+        mTextureViewUniform = mDevice.getUniform(mTextureShader, "uView");
+        mTextureModelUniform = mDevice.getUniform(mTextureShader, "uModel");
+        mTextureTransformUniform = mDevice.getUniform(mTextureShader, "uTextureTransform");
+        mTextureColorUniform = mDevice.getUniform(mTextureShader, "uColor");
+        mTextureSamplerUniform = mDevice.getUniform(mTextureShader, "uTexture");
     }
 
     void OpenGLRenderer::createRectGeometry() {
@@ -154,6 +215,45 @@ namespace backend {
             mRectVBO,
             sizeof(RectVertex),
             std::span(&POSITION_ATTRIBUTE, 1)
+        );
+    }
+
+    void OpenGLRenderer::createTextureGeometry() {
+        static std::array<TextureVertex, 6> VERTICES = {{
+            {{-0.5f, -0.5f}, {0.0f, 0.0f}},
+            {{ 0.5f, -0.5f}, {1.0f, 0.0f}},
+            {{ 0.5f,  0.5f}, {1.0f, 1.0f}},
+
+            {{-0.5f, -0.5f}, {0.0f, 0.0f}},
+            {{ 0.5f,  0.5f}, {1.0f, 1.0f}},
+            {{-0.5f,  0.5f}, {0.0f, 1.0f}}
+        }};
+
+        VertexAttribute attributes[] = {
+            {
+                .location = 0,
+                .components = 2,
+                .type = VertexAttributeType::Float,
+                .normalized = false,
+                .offset = offsetof(TextureVertex, position)
+            },
+            {
+                .location = 1,
+                .components = 2,
+                .type = VertexAttributeType::Float,
+                .normalized = false,
+                .offset = offsetof(TextureVertex, uv)
+            }
+        };
+
+        mTextureVBO = mDevice.createBuffer(BufferUsage::Static, sizeof(VERTICES), VERTICES.data());
+        mTextureVAO = mDevice.createVertexArray();
+
+        mDevice.setVertexLayout(
+            mTextureVAO,
+            mTextureVBO,
+            sizeof(TextureVertex),
+            attributes
         );
     }
 }
