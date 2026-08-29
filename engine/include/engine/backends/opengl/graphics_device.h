@@ -50,11 +50,19 @@ namespace backend {
     private:
         using uint = unsigned int;
 
+        static constexpr size_t MAX_TEXTURE_SLOTS = 16;
+
         util::HandleStorage<uint, BufferHandleTag> mBuffers;
         util::HandleStorage<uint, ShaderHandleTag> mShaders;
         util::HandleStorage<uint, TextureHandleTag> mTextures;
         util::HandleStorage<int, UniformHandleTag> mUniforms;
         util::HandleStorage<uint, VertexArrayHandleTag> mVertexArrays;
+
+        ShaderHandle mBoundShader = nullptr;
+        VertexArrayHandle mBoundVertexArray = nullptr;
+        std::array<TextureHandle, MAX_TEXTURE_SLOTS> mBoundTextures;
+        BlendMode mCurrentBlendMode = BlendMode::None;
+        bool mBlendModeInitialized = false;
 
         static uint ToGLPrimitive(PrimitiveType primitive);
         static uint ToGLUsage(BufferUsage usage);

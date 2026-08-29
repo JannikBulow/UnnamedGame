@@ -57,9 +57,12 @@ namespace backend {
         GLuint vao = mVertexArrays.get(vertexArray);
         glDeleteVertexArrays(1, &vao);
         mVertexArrays.destroy(vertexArray);
+        if (mBoundVertexArray == vertexArray) mBoundVertexArray = nullptr;
     }
 
     void OpenGLGraphicsDevice::bindVertexArray(VertexArrayHandle vertexArray) {
+        if (mBoundVertexArray == vertexArray) return;
+
         GLuint vao = mVertexArrays.get(vertexArray);
         glBindVertexArray(vao);
     }
@@ -72,6 +75,10 @@ namespace backend {
         glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glEnableVertexAttribArray(location);
         glVertexAttribPointer(location, componentCount, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const void*>(static_cast<uintptr_t>(offset)));
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindVertexArray(0);
+
+        mBoundVertexArray = nullptr;
     }
 
     void OpenGLGraphicsDevice::setVertexLayout(VertexArrayHandle vertexArray, BufferHandle buffer, int stride, std::span<const VertexAttribute> attributes) {
@@ -95,6 +102,8 @@ namespace backend {
 
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindVertexArray(0);
+
+        mBoundVertexArray = nullptr;
     }
 
     ShaderHandle OpenGLGraphicsDevice::createShader(const char* vertexSource, const char* fragmentSource) {
@@ -109,9 +118,13 @@ namespace backend {
         GLuint program = mShaders.get(shader);
         glDeleteProgram(program);
         mShaders.destroy(shader);
+
+        if (mBoundShader == shader) mBoundShader = nullptr;
     }
 
     void OpenGLGraphicsDevice::bindShader(ShaderHandle shader) {
+        if (mBoundShader == shader) return;
+
         GLuint program = mShaders.get(shader);
         glUseProgram(program);
     }
@@ -190,12 +203,20 @@ namespace backend {
         GLuint id = mTextures.get(texture);
         glDeleteTextures(1, &id);
         mTextures.destroy(texture);
+
+        for (auto& bound : mBoundTextures) {
+            if (bound == texture) bound = nullptr;
+        }
     }
 
     void OpenGLGraphicsDevice::bindTexture(unsigned slot, TextureHandle texture) {
+        if (slot < MAX_TEXTURE_SLOTS && mBoundTextures[slot] == texture) return;
+
         GLuint id = mTextures.get(texture);
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, id);
+
+        if (slot < MAX_TEXTURE_SLOTS) mBoundTextures[slot] = texture;
     }
 
     void OpenGLGraphicsDevice::setTextureFilter(TextureHandle texture, TextureFilter filter) {
@@ -217,6 +238,8 @@ namespace backend {
     }
 
     void OpenGLGraphicsDevice::setBlendMode(BlendMode mode) {
+        if (mBlendModeInitialized && mCurrentBlendMode == mode) return;
+
         switch (mode) {
             case BlendMode::None:
                 glDisable(GL_BLEND);
@@ -230,6 +253,9 @@ namespace backend {
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE);
                 break;
         }
+
+        mCurrentBlendMode = mode;
+        mBlendModeInitialized = true;
     }
 
     void OpenGLGraphicsDevice::draw(DrawCommand command) {
