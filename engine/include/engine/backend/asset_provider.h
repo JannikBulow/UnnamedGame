@@ -44,7 +44,7 @@ namespace backend {
         virtual Image loadImage(const char* path) = 0;
         virtual void unloadImage(Image image) = 0;
 
-        virtual Font loadFont(const char* path, int size) = 0;
+        virtual Font loadFont(const char* path, int size, const uint32_t* codepoints = nullptr, int codepointCount = 0) = 0;
         virtual void unloadFont(Font font) = 0;
     };
 }

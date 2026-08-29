@@ -13,6 +13,9 @@ namespace backend {
 
         Image loadImage(const char* path) override;
         void unloadImage(Image image) override;
+
+        Font loadFont(const char* path, int size, const uint32_t* codepoints, int codepointCount) override;
+        void unloadFont(Font font) override;
     };
 }
 
