@@ -26,23 +26,23 @@ namespace backend {
     }
 
     BufferHandle OpenGLGraphicsDevice::createBuffer(BufferUsage usage, size_t size, const void* initialData) {
-        GLuint buffer = 0;
-        glGenBuffers(1, &buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, buffer);
+        GLuint vbo = 0;
+        glGenBuffers(1, &vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
         glBufferData(GL_ARRAY_BUFFER, static_cast<GLsizeiptr>(size), initialData, ToGLUsage(usage));
 
-        return mBuffers.create(buffer);
+        return mBuffers.create(vbo);
     }
 
     void OpenGLGraphicsDevice::destroyBuffer(BufferHandle buffer) {
-        GLuint id = mBuffers.get(buffer);
-        glDeleteBuffers(1, &id);
+        GLuint vbo = mBuffers.get(buffer);
+        glDeleteBuffers(1, &vbo);
     }
 
     void OpenGLGraphicsDevice::updateBuffer(BufferHandle buffer, size_t offset, size_t size, const void* data) {
-        GLuint id = mBuffers.get(buffer);
-        glBindBuffer(GL_ARRAY_BUFFER, id);
+        GLuint vbo = mBuffers.get(buffer);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glBufferSubData(GL_ARRAY_BUFFER, static_cast<GLintptr>(offset), static_cast<GLsizeiptr>(size), data);
     }
 
@@ -62,30 +62,22 @@ namespace backend {
         glBindVertexArray(vao);
     }
 
-    void OpenGLGraphicsDevice::setVertexBuffer(VertexArrayHandle vertexArray, BufferHandle buffer, int stride) {
+    void OpenGLGraphicsDevice::setVertexAttribute(VertexArrayHandle vertexArray, BufferHandle buffer, int stride, int location, int componentCount, int offset) {
         GLuint vao = mVertexArrays.get(vertexArray);
-        GLuint id = mBuffers.get(buffer);
+        GLuint vbo = mBuffers.get(buffer);
 
         glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, id);
-
-        (void) stride;
-    }
-
-    void OpenGLGraphicsDevice::setVertexAttribute(VertexArrayHandle vertexArray, int stride, int location, int componentCount, int offset) {
-        GLuint vao = mVertexArrays.get(vertexArray);
-
-        glBindVertexArray(vao);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
         glEnableVertexAttribArray(location);
         glVertexAttribPointer(location, componentCount, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const void*>(static_cast<uintptr_t>(offset)));
     }
 
     void OpenGLGraphicsDevice::setVertexLayout(VertexArrayHandle vertexArray, BufferHandle buffer, int stride, std::span<const VertexAttribute> attributes) {
         GLuint vao = mVertexArrays.get(vertexArray);
-        GLuint id = mBuffers.get(buffer);
+        GLuint vbo = mBuffers.get(buffer);
 
         glBindVertexArray(vao);
-        glBindBuffer(GL_ARRAY_BUFFER, id);
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
         for (const auto& attribute : attributes) {
             glEnableVertexAttribArray(attribute.location);

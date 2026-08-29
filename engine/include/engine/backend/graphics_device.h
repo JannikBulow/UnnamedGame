@@ -92,8 +92,7 @@ namespace backend {
         virtual VertexArrayHandle createVertexArray() = 0;
         virtual void destroyVertexArray(VertexArrayHandle vertexArray) = 0;
         virtual void bindVertexArray(VertexArrayHandle vertexArray) = 0;
-        virtual void setVertexBuffer(VertexArrayHandle vertexArray, BufferHandle buffer, int stride) = 0;
-        virtual void setVertexAttribute(VertexArrayHandle vertexArray, int stride, int location, int componentCount, int offset) = 0;
+        virtual void setVertexAttribute(VertexArrayHandle vertexArray, BufferHandle buffer, int stride, int location, int componentCount, int offset) = 0;
         virtual void setVertexLayout(VertexArrayHandle vertexArray, BufferHandle buffer, int stride, std::span<const VertexAttribute> attributes) = 0;
 
         virtual ShaderHandle createShader(const char* vertexSource, const char* fragmentSource) = 0;
