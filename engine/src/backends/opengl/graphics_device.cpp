@@ -72,12 +72,12 @@ namespace backend {
         (void) stride;
     }
 
-    void OpenGLGraphicsDevice::setVertexAttribute(VertexArrayHandle vertexArray, int location, int componentCount, int offset) {
+    void OpenGLGraphicsDevice::setVertexAttribute(VertexArrayHandle vertexArray, int stride, int location, int componentCount, int offset) {
         GLuint vao = mVertexArrays.get(vertexArray);
 
         glBindVertexArray(vao);
         glEnableVertexAttribArray(location);
-        glVertexAttribPointer(location, componentCount, GL_FLOAT, GL_FALSE, 0, reinterpret_cast<const void*>(static_cast<uintptr_t>(offset)));
+        glVertexAttribPointer(location, componentCount, GL_FLOAT, GL_FALSE, stride, reinterpret_cast<const void*>(static_cast<uintptr_t>(offset)));
     }
 
     void OpenGLGraphicsDevice::setVertexLayout(VertexArrayHandle vertexArray, BufferHandle buffer, int stride, std::span<const VertexAttribute> attributes) {

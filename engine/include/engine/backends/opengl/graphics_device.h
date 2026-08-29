@@ -23,7 +23,7 @@ namespace backend {
         void destroyVertexArray(VertexArrayHandle vertexArray) override;
         void bindVertexArray(VertexArrayHandle vertexArray) override;
         void setVertexBuffer(VertexArrayHandle vertexArray, BufferHandle buffer, int stride) override;
-        void setVertexAttribute(VertexArrayHandle vertexArray, int location, int componentCount, int offset) override;
+        void setVertexAttribute(VertexArrayHandle vertexArray, int stride, int location, int componentCount, int offset) override;
         void setVertexLayout(VertexArrayHandle vertexArray, BufferHandle buffer, int stride, std::span<const VertexAttribute> attributes) override;
 
         ShaderHandle createShader(const char* vertexSource, const char* fragmentSource) override;
