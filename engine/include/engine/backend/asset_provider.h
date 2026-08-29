@@ -35,6 +35,23 @@ namespace backend {
         int glyphCount;
         Image atlas;
         Glyph* glyphs;
+
+        int getGlyphIndex(uint32_t codepoint) const {
+            int index = 0;
+            int fallbackIndex = 0;
+
+            for (int i = 0; i < glyphCount; i++) {
+                if (glyphs[i].codepoint == '?') fallbackIndex = i;
+
+                if (glyphs[i].codepoint == codepoint) {
+                    index = i;
+                    break;
+                }
+            }
+
+            if (index == 0 && glyphs[0].codepoint != codepoint) index = fallbackIndex;
+            return index;
+        }
     };
 
     class IAssetProvider {
