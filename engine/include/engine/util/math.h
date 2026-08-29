@@ -125,6 +125,11 @@ namespace math {
         constexpr Vec2T() = default;
         constexpr Vec2T(T x, T y) : x(x), y(y) {}
 
+        template<class U>
+        explicit constexpr operator Vec2T<U>() const {
+            return {U(x), U(y)};
+        }
+
         static constexpr Vec2T Zero() { return {0, 0}; }
         static constexpr Vec2T One() { return {1, 1}; }
         static constexpr Vec2T UnitX() { return {1, 0}; };
