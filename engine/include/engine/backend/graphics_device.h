@@ -91,6 +91,7 @@ namespace backend {
         virtual void destroyShader(ShaderHandle shader) = 0;
         virtual void bindShader(ShaderHandle shader) = 0;
 
+        // TODO: redesign uniforms because currently they're technically memory leaks
         virtual UniformHandle getUniform(ShaderHandle shader, const char* name) = 0;
         virtual void setUniform(UniformHandle uniform, int value) = 0;
         virtual void setUniform(UniformHandle uniform, float value) = 0;
