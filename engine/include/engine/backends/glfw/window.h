@@ -9,6 +9,7 @@ struct GLFWwindow;
 
 namespace backend {
     class GLFWWindow : public IWindow {
+        friend class GLFWInputProvider;
     public:
         GLFWWindow(int width, int height, const char* title);
         ~GLFWWindow() override;

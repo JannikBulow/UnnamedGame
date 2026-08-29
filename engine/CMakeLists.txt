@@ -71,6 +71,7 @@ endif()
 find_package(OpenGL REQUIRED)
 
 set(SOURCES
+    src/backends/glfw/input_provider.cpp
     src/backends/glfw/window.cpp
 
     src/backends/opengl/graphics_device.cpp
@@ -82,6 +83,7 @@ set(SOURCES
 )
 
 set(HEADERS
+    include/engine/backends/glfw/input_provider.h
     include/engine/backends/glfw/window.h
 
     include/engine/backend/asset_provider.h
