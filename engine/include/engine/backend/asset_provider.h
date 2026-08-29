@@ -18,7 +18,6 @@ namespace backend {
         int height;
         ImageFormat format;
         const uint8_t* pixels;
-        size_t byteCount; // how many bytes in the pixels
     };
 
     class IAssetProvider {

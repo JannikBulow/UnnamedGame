@@ -52,7 +52,6 @@ namespace backend {
             .height = height,
             .format = format,
             .pixels = pixels,
-            .byteCount = byteCount
         };
         std::memcpy(pixels, data, byteCount);
 
