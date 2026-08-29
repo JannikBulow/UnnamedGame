@@ -75,6 +75,15 @@ namespace backend {
         math::Color color;
     };
 
+    struct DrawTextureCommand {
+        TextureHandle texture;
+        math::Vec2 position;
+        math::Vec2 size;
+        math::Rect uv = {0, 1, 1, 0};
+        math::Color color;
+        float rotation = 0.0f;
+    };
+
     class IRenderer {
     public:
         virtual ~IRenderer() = default;
@@ -91,6 +100,8 @@ namespace backend {
         virtual void clearScreen(math::Color color) = 0;
 
         virtual void drawRect(const DrawRectCommand& command) = 0;
+
+        virtual void drawTexture(const DrawTextureCommand& command) = 0;
     };
 }
 
