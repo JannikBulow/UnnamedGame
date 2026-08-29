@@ -11,6 +11,10 @@
 #include <limits>
 
 namespace backend {
+    StbAssetProvider::StbAssetProvider() {
+        stbi_set_flip_vertically_on_load(true);
+    }
+
     Image StbAssetProvider::loadImage(const char* path) {
         int width = 0;
         int height = 0;

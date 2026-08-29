@@ -8,6 +8,8 @@
 namespace backend {
     class StbAssetProvider : public IAssetProvider {
     public:
+        StbAssetProvider();
+
         Image loadImage(const char* path) override;
         void unloadImage(Image image) override;
     };
