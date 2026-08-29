@@ -29,7 +29,20 @@ namespace backend {
         void drawTexture(const DrawTextureCommand& command) override;
 
     private:
+        struct ColorVertex {
+            math::Vec2 position;
+            math::Color4F color;
+        };
+
+        struct TextureVertex {
+            math::Vec2 position;
+            math::Vec2 uv;
+            math::Color4F color;
+        };
+
         using uint = unsigned int;
+
+        static constexpr size_t MAX_BATCH_QUADS = 4096;
 
         IGraphicsDevice& mDevice;
         IWindow& mWindow;
@@ -38,29 +51,32 @@ namespace backend {
 
         UniformHandle mColorProjectionUniform;
         UniformHandle mColorViewUniform;
-        UniformHandle mColorModelUniform;
-        UniformHandle mColorColorUniform;
 
         ShaderHandle mTextureShader;
 
         UniformHandle mTextureProjectionUniform;
         UniformHandle mTextureViewUniform;
-        UniformHandle mTextureModelUniform;
-        UniformHandle mTextureTransformUniform;
-        UniformHandle mTextureColorUniform;
         UniformHandle mTextureSamplerUniform;
 
 
         VertexArrayHandle mRectVAO;
         BufferHandle mRectVBO;
+        std::vector<ColorVertex> mRectBatch;
 
         VertexArrayHandle mTextureVAO;
         BufferHandle mTextureVBO;
+        std::vector<TextureVertex> mTextureBatch;
+        TextureHandle mBatchTexture;
 
         void initGL();
         void createShaders();
         void createRectGeometry();
         void createTextureGeometry();
+
+        void warmupShaders();
+
+        void flushRectBatch();
+        void flushTextureBatch();
     };
 }
 

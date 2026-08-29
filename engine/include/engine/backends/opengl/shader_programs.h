@@ -8,25 +8,28 @@ namespace backend::shaders {
 #version 330 core
 
 layout(location = 0) in vec2 aPosition;
+layout(location = 1) in vec4 aColor;
 
 uniform mat4 uProjection;
 uniform mat4 uView;
-uniform mat4 uModel;
+
+out vec4 vColor;
 
 void main() {
-    gl_Position = uProjection * uView * uModel * vec4(aPosition, 0.0, 1.0);
+    vColor = aColor;
+    gl_Position = uProjection * uView * vec4(aPosition, 0.0, 1.0);
 }
 )";
 
     constexpr const char* ColorFragment = R"(
 #version 330 core
 
-uniform vec4 uColor;
+in vec4 vColor;
 
 out vec4 FragColor;
 
 void main() {
-    FragColor = uColor;
+    FragColor = vColor;
 }
 )";
 
@@ -35,19 +38,19 @@ void main() {
 
 layout(location = 0) in vec2 aPosition;
 layout(location = 1) in vec2 aUV;
+layout(location = 2) in vec4 aColor;
 
 out vec2 vUV;
+out vec4 vColor;
 
 uniform mat4 uProjection;
 uniform mat4 uView;
-uniform mat4 uModel;
-
-uniform mat3 uTextureTransform;
 
 void main() {
-    vUV = (uTextureTransform * vec3(aUV, 1.0)).xy;
+    vUV = aUV;
+    vColor = aColor;
 
-    gl_Position = uProjection * uView * uModel * vec4(aPosition, 0.0, 1.0);
+    gl_Position = uProjection * uView * vec4(aPosition, 0.0, 1.0);
 }
 )";
 
@@ -55,14 +58,14 @@ void main() {
 #version 330 core
 
 in vec2 vUV;
+in vec4 vColor;
 
 uniform sampler2D uTexture;
-uniform vec4 uColor;
 
 out vec4 FragColor;
 
 void main() {
-    FragColor = texture(uTexture, vUV) * uColor;
+    FragColor = texture(uTexture, vUV) * vColor;
 }
 )";
 }
