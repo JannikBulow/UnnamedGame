@@ -126,7 +126,7 @@ namespace backend {
     }
 
     void OpenGLRenderer::drawTexture(const DrawTextureCommand& command) {
-        math::Mat4 model = math::Mat4::Translation(command.position) * math::Mat4::Scale(command.size);
+        math::Mat4 model = math::Mat4::Translation(command.position) * math::Mat4::RotationZ(-command.rotation) * math::Mat4::Scale(command.size);
         math::Mat3 transform;
 
         transform(0, 0) = command.uv.right - command.uv.left;
