@@ -81,7 +81,7 @@ namespace backend {
         math::Vec2 position;
         math::Vec2 size;
         math::Rect uv = {0, 1, 1, 0};
-        math::Color color;
+        math::Color color = math::Color::White;
         float rotation = 0.0f; // rads
     };
 
