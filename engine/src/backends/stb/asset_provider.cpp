@@ -41,13 +41,14 @@ namespace backend {
         size_t pixelCount = static_cast<size_t>(width) * static_cast<size_t>(height);
         size_t byteCount = pixelCount * channels;
 
-        unsigned char* pixels = new unsigned char[byteCount];
+        uint8_t* pixels = new uint8_t[byteCount];
 
         Image image = {
             .width = width,
             .height = height,
             .format = format,
             .pixels = pixels,
+            .byteCount = byteCount
         };
         std::memcpy(pixels, data, byteCount);
 

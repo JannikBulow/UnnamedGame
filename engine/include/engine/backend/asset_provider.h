@@ -4,6 +4,7 @@
 #define UNNAMEDGAME_ENGINE_BACKEND_ASSET_PROVIDER_H
 
 #include <cstdint>
+#include <cstddef>
 
 namespace backend {
     enum class ImageFormat {
@@ -17,6 +18,7 @@ namespace backend {
         int height;
         ImageFormat format;
         const uint8_t* pixels;
+        size_t byteCount; // how many bytes in the pixels
     };
 
     class IAssetProvider {
