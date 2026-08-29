@@ -9,20 +9,49 @@
 namespace math {
     struct Color4F {
         float r, g, b, a;
+
+        Color4F() = default;
+        Color4F(float r, float g, float b) : r(r), g(g), b(b), a(1.0f) {}
+        Color4F(float r, float g, float b, float a) : r(r), g(g), b(b), a(a) {}
+
+        struct Color4B toColor4B() const;
     };
 
     struct Color4B {
         unsigned char r, g, b, a;
 
-        Color4F toColor4F() const {
-            return {
-                static_cast<float>(r) / 255.0f,
-                static_cast<float>(g) / 255.0f,
-                static_cast<float>(b) / 255.0f,
-                static_cast<float>(a) / 255.0f,
-            };
+        Color4B() = default;
+        Color4B(unsigned char r, unsigned char g, unsigned char b) : r(r), g(g), b(b), a(255) {}
+        Color4B(unsigned char r, unsigned char g, unsigned char b, unsigned char a) : r(r), g(g), b(b), a(a) {}
+
+        constexpr int rgb() const {
+            return (0xFF << 24) | (r << 16) | (g << 8) | b;
         }
+
+        constexpr int rgba() const {
+            return (a << 24) | (r << 16) | (g << 8) | b;
+        }
+
+        Color4F toColor4F() const;
     };
+
+    inline Color4B Color4F::toColor4B() const {
+        return {
+            static_cast<unsigned char>(r * 255),
+            static_cast<unsigned char>(g * 255),
+            static_cast<unsigned char>(b * 255),
+            static_cast<unsigned char>(a * 255)
+        };
+    }
+
+    inline Color4F Color4B::toColor4F() const {
+        return {
+            static_cast<float>(r) / 255.0f,
+            static_cast<float>(g) / 255.0f,
+            static_cast<float>(b) / 255.0f,
+            static_cast<float>(a) / 255.0f,
+        };
+    }
 
     using Color = Color4B;
 
