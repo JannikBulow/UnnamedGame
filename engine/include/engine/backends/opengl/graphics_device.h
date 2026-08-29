@@ -34,6 +34,7 @@ namespace backend {
         void setUniform(UniformHandle uniform, int value) override;
         void setUniform(UniformHandle uniform, float value) override;
         void setUniform(UniformHandle uniform, math::Vec2F value) override;
+        void setUniform(UniformHandle uniform, math::Mat3F value) override;
         void setUniform(UniformHandle uniform, math::Mat4F value) override;
         void setUniform(UniformHandle uniform, math::Color4B value) override;
 

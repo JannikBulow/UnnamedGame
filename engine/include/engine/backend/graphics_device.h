@@ -104,6 +104,7 @@ namespace backend {
         virtual void setUniform(UniformHandle uniform, int value) = 0;
         virtual void setUniform(UniformHandle uniform, float value) = 0;
         virtual void setUniform(UniformHandle uniform, math::Vec2F value) = 0;
+        virtual void setUniform(UniformHandle uniform, math::Mat3F value) = 0;
         virtual void setUniform(UniformHandle uniform, math::Mat4F value) = 0;
         virtual void setUniform(UniformHandle uniform, math::Color4B value) = 0;
 

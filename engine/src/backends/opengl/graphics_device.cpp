@@ -141,6 +141,11 @@ namespace backend {
         glUniform2f(id, value.x, value.y);
     }
 
+    void OpenGLGraphicsDevice::setUniform(UniformHandle uniform, math::Mat3F value) {
+        GLint id = mUniforms.get(uniform);
+        glUniformMatrix3fv(id, 1, GL_FALSE, value.data());
+    }
+
     void OpenGLGraphicsDevice::setUniform(UniformHandle uniform, math::Mat4F value) {
         GLint id = mUniforms.get(uniform);
         glUniformMatrix4fv(id, 1, GL_FALSE, value.data());
