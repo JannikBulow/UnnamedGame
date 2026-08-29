@@ -17,10 +17,9 @@ namespace backend {
         math::Vec2 uv;
     };
 
-    void APIENTRY GLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {
-    }
+    void APIENTRY GLDebugCallback(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar* message, const void* userParam) {}
 
-    OpenGLRenderer::OpenGLRenderer(IGraphicsDevice& device, GLFWWindow& window)
+    OpenGLRenderer::OpenGLRenderer(IGraphicsDevice& device, IWindow& window)
         : mDevice(device)
         , mWindow(window) {
         if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress))) {
@@ -58,7 +57,7 @@ namespace backend {
 
     void OpenGLRenderer::endFrame() {
         mDevice.endFrame();
-        glfwSwapBuffers(mWindow.getHandle());
+        mWindow.swapBuffers();
     }
 
     void OpenGLRenderer::beginWorld(const Camera2D& camera) {

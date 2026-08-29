@@ -5,13 +5,12 @@
 
 #include "engine/backend/graphics_device.h"
 #include "engine/backend/renderer.h"
-
-#include "engine/backends/opengl/window.h"
+#include "engine/backend/window.h"
 
 namespace backend {
     class OpenGLRenderer : public IRenderer {
     public:
-        OpenGLRenderer(IGraphicsDevice& device, GLFWWindow& window);
+        OpenGLRenderer(IGraphicsDevice& device, IWindow& window);
         ~OpenGLRenderer() override;
 
         void beginFrame() override;
@@ -33,7 +32,7 @@ namespace backend {
         using uint = unsigned int;
 
         IGraphicsDevice& mDevice;
-        GLFWWindow& mWindow;
+        IWindow& mWindow;
 
         ShaderHandle mColorShader;
 
