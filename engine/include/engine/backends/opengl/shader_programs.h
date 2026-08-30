@@ -68,6 +68,24 @@ void main() {
     FragColor = texture(uTexture, vUV) * vColor;
 }
 )";
+
+    constexpr const char* FontVertex = TextureVertex;
+
+    constexpr const char* FontFragment = R"(
+#version 330 core
+
+in vec2 vUV;
+in vec4 vColor;
+
+uniform sampler2D uTexture;
+
+out vec4 FragColor;
+
+void main() {
+    float alpha = texture(uTexture, vUV).r;
+    FragColor = vec4(vColor.rgb, vColor.a * alpha);
+}
+)";
 }
 
 #endif //UNNAMEDGAME_ENGINE_BACKENDS_OPENGL_SHADER_PROGRAMS_H
