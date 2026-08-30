@@ -131,7 +131,10 @@ namespace backend {
 
     UniformHandle OpenGLGraphicsDevice::getUniform(ShaderHandle shader, const char* name) {
         GLuint program = mShaders.get(shader);
-        return mUniforms.create(glGetUniformLocation(program, name));
+        GLint uniform = glGetUniformLocation(program, name);
+
+        if (uniform < 0) return nullptr;
+        return mUniforms.create(uniform);
     }
 
     void OpenGLGraphicsDevice::setUniform(UniformHandle uniform, int value) {
