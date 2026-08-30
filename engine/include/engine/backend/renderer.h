@@ -85,6 +85,35 @@ namespace backend {
         float rotation = 0.0f; // rads
     };
 
+    struct DrawCodepointCommand {
+        TextureHandle texture; // gpu version of font.atlas
+        Font font;
+        uint32_t codepoint;
+        float fontSize;
+        math::Vec2 position;
+        math::Color color;
+    };
+
+    struct DrawCodepointsCommand {
+        TextureHandle texture; // gpu version of font.atlas
+        Font font;
+        std::span<uint32_t> codepoints;
+        float fontSize;
+        float spacing;
+        math::Vec2 position;
+        math::Color color;
+    };
+
+    struct DrawTextCommand {
+        TextureHandle texture; // gpu version of font.atlas
+        Font font;
+        const char* text;
+        float fontSize;
+        float spacing;
+        math::Vec2 position;
+        math::Color color;
+    };
+
     class IRenderer {
     public:
         virtual ~IRenderer() = default;
@@ -103,6 +132,10 @@ namespace backend {
         virtual void drawRect(const DrawRectCommand& command) = 0;
 
         virtual void drawTexture(const DrawTextureCommand& command) = 0;
+
+        virtual void drawCodepoint(const DrawCodepointCommand& command) = 0;
+        virtual void drawCodepoints(const DrawCodepointsCommand& command) = 0;
+        virtual void drawText(const DrawTextCommand& command) = 0;
     };
 }
 
