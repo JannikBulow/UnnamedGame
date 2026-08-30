@@ -143,7 +143,7 @@ namespace backend {
 
             // fuck stbtt
             auto mutableCodepoints = std::make_unique<int[]>(codepointCount);
-            std::memcpy(mutableCodepoints.get(), codepoints, codepointCount);
+            std::memcpy(mutableCodepoints.get(), codepoints, codepointCount * sizeof(int));
 
             stbtt_pack_range range = {
                 .font_size = static_cast<float>(size),
