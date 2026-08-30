@@ -46,18 +46,9 @@ int main() {
         if (inputProvider.isKeyDown(backend::Key::D)) playerPosition.x += 10 * dt;
 
         renderer.beginFrame();
-        renderer.clearScreen(math::Color::White);
+        renderer.clearScreen(math::Color::LightGray);
 
         renderer.beginWorld(camera);
-
-        renderer.drawCodepoint({
-            .texture = fontTexture,
-            .font = font,
-            .codepoint = 'h',
-            .fontSize = 1.2f,
-            .position = {0, 0},
-            .color = math::Color::Black,
-        });
 
         renderer.drawTexture({
             .texture = rat,
@@ -69,6 +60,15 @@ int main() {
         renderer.endWorld();
 
         renderer.beginUI();
+
+        renderer.drawCodepoint({
+            .texture = fontTexture,
+            .font = font,
+            .codepoint = 'h',
+            .fontSize = 12.0f,
+            .position = {100, 100},
+            .color = math::Color::Black,
+        });
 
         renderer.endUI();
         renderer.endFrame();

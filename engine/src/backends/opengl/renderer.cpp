@@ -39,9 +39,10 @@ namespace backend {
         , mWindow(window)
         , mRectPipeline(*this)
         , mTexturePipeline(*this)
+        , mFontPipeline(*this)
         , mRectBatch(*this)
         , mTextureBatch(*this)
-        , mRenderQueue({&mRectPipeline, &mTexturePipeline}, {&mRectBatch, &mTextureBatch}) {
+        , mRenderQueue({&mRectPipeline, &mTexturePipeline, &mFontPipeline}, {&mRectBatch, &mTextureBatch}) {
         if (!gladLoadGL(reinterpret_cast<GLADloadfunc>(glfwGetProcAddress))) {
             throw util::GameException();
         }
@@ -52,6 +53,7 @@ namespace backend {
 
         mRectPipeline = {*this, mDevice.createShader(shaders::ColorVertex, shaders::ColorFragment)};
         mTexturePipeline = {*this, mDevice.createShader(shaders::TextureVertex, shaders::TextureFragment)};
+        mFontPipeline = {*this, mDevice.createShader(shaders::FontVertex, shaders::FontFragment)};
         mRectBatch = {*this, CreateRectAttributes(), sizeof(ColorVertex), MAX_BATCH_QUADS * 6};
         mTextureBatch = {*this, CreateTextureAttributes(), sizeof(TextureVertex), MAX_BATCH_QUADS * 6};
 
@@ -97,8 +99,8 @@ namespace backend {
         math::Mat4 projection = math::Mat4::Orthographic(
             0.0f,
             static_cast<float>(frameBufferSize.x),
-            0.0f,
-            static_cast<float>(frameBufferSize.y)
+            static_cast<float>(frameBufferSize.y),
+            0.0f
         );
 
         mRenderQueue.setProjections(projection);
@@ -125,24 +127,7 @@ namespace backend {
     }
 
     void OpenGLRenderer::drawTexture(const DrawTextureCommand& command) {
-        math::Mat4 model = math::Mat4::Translation(command.position) * math::Mat4::RotationZ(-command.rotation) * math::Mat4::Scale(command.size);
-        float uMin = command.uv.left;
-        float uRange = command.uv.right - command.uv.left;
-        float vMin = command.uv.bottom;
-        float vRange = command.uv.top - command.uv.bottom;
-
-        std::array<TextureVertex, 6> vertices{};
-
-        for (size_t i = 0; i < QUAD_CORNERS.size(); i++) {
-            math::Vec2 uv = {
-                uMin + QUAD_UVS[i].x * uRange,
-                vMin + QUAD_UVS[i].y * vRange
-            };
-
-            vertices[i] = {TransformPoint(model, QUAD_CORNERS[i]), uv, math::Color4F(command.color)};
-        }
-
-        mRenderQueue.submit(mTexturePipeline, mTextureBatch, command.texture, 6, vertices.data());
+        drawTextureTo(command, mTexturePipeline, mTextureBatch);
     }
 
     void OpenGLRenderer::drawCodepoint(const DrawCodepointCommand& command) {
@@ -152,21 +137,21 @@ namespace backend {
         float glyphWidth = (glyph.atlasBounds.right - glyph.atlasBounds.left) * scale;
         float glyphHeight = (glyph.atlasBounds.bottom - glyph.atlasBounds.top) * scale;
 
-        drawTexture({
+        drawTextureTo({
             .texture = command.texture,
             .position = {
-                command.position.x + static_cast<float>(glyph.offsetX) * scale,
-                command.position.y + static_cast<float>(glyph.offsetY) * scale
+                command.position.x + (static_cast<float>(glyph.offsetX) * scale) + glyphWidth * 0.5f,
+                command.position.y + (static_cast<float>(glyph.offsetY) * scale) + glyphHeight * 0.5f
             },
             .size = {glyphWidth, glyphHeight},
             .uv = {
                 glyph.atlasBounds.left / static_cast<float>(command.font.atlas.width),
                 glyph.atlasBounds.right / static_cast<float>(command.font.atlas.width),
-                1.0f - glyph.atlasBounds.top / static_cast<float>(command.font.atlas.height),
-                1.0f - glyph.atlasBounds.bottom / static_cast<float>(command.font.atlas.height)
+                glyph.atlasBounds.top / static_cast<float>(command.font.atlas.height),
+                glyph.atlasBounds.bottom / static_cast<float>(command.font.atlas.height)
             },
             .color = command.color
-        });
+        }, mFontPipeline, mTextureBatch);
     }
 
     void OpenGLRenderer::drawCodepoints(const DrawCodepointsCommand& command) {}
@@ -204,9 +189,9 @@ namespace backend {
         mView = other.mView;
 
         other.mShader = nullptr;
-        other.mProjectionUniform = other.mProjectionUniform;
-        other.mViewUniform = other.mViewUniform;
-        other.mTextureUniform = other.mTextureUniform;
+        other.mProjectionUniform = nullptr;
+        other.mViewUniform = nullptr;
+        other.mTextureUniform = nullptr;
 
         return *this;
     }
@@ -249,7 +234,7 @@ namespace backend {
         mRenderer.mDevice.setVertexLayout(
             mVAO,
             mVBO,
-            mVertexSize,
+            static_cast<int>(mVertexSize),
             attributes
         );
     }
@@ -351,6 +336,7 @@ namespace backend {
             if (currentPipeline != command.pipeline) {
                 command.pipeline->bind();
                 currentPipeline = command.pipeline;
+                currentTexture = nullptr;
             }
 
             if (command.texture && currentTexture != command.texture) {
@@ -360,6 +346,8 @@ namespace backend {
 
             command.batch->draw(command.vertexOffset, command.vertexCount);
         }
+
+        mCommands.clear();
     }
 
     std::span<const VertexAttribute> OpenGLRenderer::CreateRectAttributes() {
@@ -409,11 +397,35 @@ namespace backend {
         return attributes;
     }
 
+    void OpenGLRenderer::drawTextureTo(const DrawTextureCommand& command, Pipeline& pipeline, Batch& batch) {
+        math::Mat4 model = math::Mat4::Translation(command.position) * math::Mat4::RotationZ(-command.rotation) * math::Mat4::Scale(command.size);
+        float uMin = command.uv.left;
+        float uRange = command.uv.right - command.uv.left;
+        float vMin = command.uv.bottom;
+        float vRange = command.uv.top - command.uv.bottom;
+
+        std::array<TextureVertex, 6> vertices{};
+
+        for (size_t i = 0; i < QUAD_CORNERS.size(); i++) {
+            math::Vec2 uv = {
+                uMin + QUAD_UVS[i].x * uRange,
+                vMin + QUAD_UVS[i].y * vRange
+            };
+
+            vertices[i] = {TransformPoint(model, QUAD_CORNERS[i]), uv, math::Color4F(command.color)};
+        }
+
+        mRenderQueue.submit(pipeline, batch, command.texture, 6, vertices.data());
+    }
+
     void OpenGLRenderer::warmupShaders() {
         mRectPipeline.bind();
         mRectBatch.draw(0, 0);
 
         mTexturePipeline.bind();
+        mTextureBatch.draw(0, 0);
+
+        mFontPipeline.bind();
         mTextureBatch.draw(0, 0);
     }
 }

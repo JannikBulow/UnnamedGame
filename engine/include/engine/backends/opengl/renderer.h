@@ -131,43 +131,17 @@ namespace backend {
 
         Pipeline mRectPipeline;
         Pipeline mTexturePipeline;
+        Pipeline mFontPipeline;
 
         Batch mRectBatch;
         Batch mTextureBatch;
 
         RenderQueue mRenderQueue;
 
-        /*
-        ShaderHandle mColorShader;
+        static std::span<const VertexAttribute> CreateRectAttributes();
+        static std::span<const VertexAttribute> CreateTextureAttributes();
 
-        UniformHandle mColorProjectionUniform;
-        UniformHandle mColorViewUniform;
-
-        ShaderHandle mTextureShader;
-
-        UniformHandle mTextureProjectionUniform;
-        UniformHandle mTextureViewUniform;
-        UniformHandle mTextureSamplerUniform;
-
-        ShaderHandle mFontShader;
-
-        UniformHandle mFontProjectionUniform;
-        UniformHandle mFontViewUniform;
-        UniformHandle mFontAtlasUniform;
-
-
-        VertexArrayHandle mRectVAO;
-        BufferHandle mRectVBO;
-        std::vector<ColorVertex> mRectBatch;
-
-        VertexArrayHandle mTextureVAO;
-        BufferHandle mTextureVBO;
-        std::vector<TextureVertex> mTextureBatch;
-        TextureHandle mBatchTexture;
-        */
-
-        std::span<const VertexAttribute> CreateRectAttributes();
-        std::span<const VertexAttribute> CreateTextureAttributes();
+        void drawTextureTo(const DrawTextureCommand& command, Pipeline& pipeline, Batch& batch);
 
         void warmupShaders();
     };

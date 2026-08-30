@@ -60,7 +60,7 @@ namespace backend {
 
         ShaderHandle mBoundShader = nullptr;
         VertexArrayHandle mBoundVertexArray = nullptr;
-        std::array<TextureHandle, MAX_TEXTURE_SLOTS> mBoundTextures;
+        std::array<TextureHandle, MAX_TEXTURE_SLOTS> mBoundTextures{};
         BlendMode mCurrentBlendMode = BlendMode::None;
         bool mBlendModeInitialized = false;
 

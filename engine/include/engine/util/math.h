@@ -254,7 +254,7 @@ namespace math {
         static constexpr MatrixT Diagonal(T value) requires(Rows == Cols) {
             MatrixT result;
             for (int i = 0; i < std::min(Rows, Cols); i++) {
-                result(i, i) = 1;
+                result(i, i) = value;
             }
             return result;
         }
