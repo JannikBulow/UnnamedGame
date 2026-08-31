@@ -19,9 +19,6 @@ int main() {
     backend::OpenGLRenderer renderer(device, window);
     backend::StbAssetProvider assetProvider;
 
-    backend::Font font = static_cast<backend::IAssetProvider&>(assetProvider).loadFont("/usr/share/fonts/TTF/OpenSans-Regular.ttf", 12);
-    backend::TextureHandle fontTexture = device.createTexture(font.atlas);
-
     backend::Image ratImage = assetProvider.loadImage("/home/jannik/Downloads/rat.png");
     backend::TextureHandle rat = device.createTexture(ratImage);
     assetProvider.unloadImage(ratImage);
@@ -30,7 +27,6 @@ int main() {
     timer.setLimit(165);
 
     backend::Camera2D camera;
-    camera.worldHeight = 20.0f;
 
     math::Vec2 playerPosition = math::Vec2::Zero();
 
@@ -45,10 +41,18 @@ int main() {
         if (inputProvider.isKeyDown(backend::Key::A)) playerPosition.x -= 10 * dt;
         if (inputProvider.isKeyDown(backend::Key::D)) playerPosition.x += 10 * dt;
 
+        camera.position = playerPosition;
+
         renderer.beginFrame();
         renderer.clearScreen(math::Color::LightGray);
 
         renderer.beginWorld(camera);
+
+        renderer.drawRect({
+            .position = math::Vec2::Zero(),
+            .size = math::Vec2::One(),
+            .color = math::Color::Blue,
+        });
 
         renderer.drawTexture({
             .texture = rat,
@@ -61,15 +65,6 @@ int main() {
 
         renderer.beginUI();
 
-        renderer.drawCodepoint({
-            .texture = fontTexture,
-            .font = font,
-            .codepoint = 'h',
-            .fontSize = 12.0f,
-            .position = {100, 100},
-            .color = math::Color::Black,
-        });
-
         renderer.endUI();
         renderer.endFrame();
 
@@ -78,10 +73,7 @@ int main() {
         std::cout << timer.getRate() << " fps\n";
     }
 
-    device.destroyTexture(fontTexture);
     device.destroyTexture(rat);
-
-    assetProvider.unloadFont(font);
 
     return 0;
 }

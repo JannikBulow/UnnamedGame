@@ -16,10 +16,10 @@ namespace backend {
             float width = height * (viewportSize.x / viewportSize.y);
 
             return {
-                position.x - width * 0.5f,
-                position.x + width * 0.5f,
-                position.y + height * 0.5f,
-                position.y - height * 0.5f
+                -width * 0.5f,
+                width * 0.5f,
+                height * 0.5f,
+                -height * 0.5f
             };
         }
 
