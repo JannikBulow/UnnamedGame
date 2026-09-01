@@ -4,6 +4,7 @@
 #define UNNAMEDGAME_ENGINE_UTIL_RESOURCE_LOCATION_H
 
 #include <filesystem>
+#include <memory>
 
 namespace util {
     class ResourceLocation {
@@ -14,7 +15,9 @@ namespace util {
         const char* cstr() const;
 
     private:
-        std::filesystem::path mPath;
+        std::unique_ptr<const char[]> mPath;
+
+        static std::unique_ptr<const char[]> CreatePath(std::string_view domain, std::string_view resource);
     };
 }
 
