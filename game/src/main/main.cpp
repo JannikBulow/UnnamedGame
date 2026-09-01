@@ -19,7 +19,7 @@ int main() {
     backend::OpenGLRenderer renderer(device, window);
     backend::StbAssetProvider assetProvider;
 
-    backend::Font font = assetProvider.loadFont("/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 12, nullptr, 0);
+    backend::Font font = assetProvider.loadFont("/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 24, nullptr, 0);
     backend::TextureHandle fontTexture = device.createTexture(font.atlas);
 
     backend::Image ratImage = assetProvider.loadImage("/home/jannik/Downloads/rat.png");
@@ -51,12 +51,6 @@ int main() {
 
         renderer.beginWorld(camera);
 
-        renderer.drawRect({
-            .position = math::Vec2::Zero(),
-            .size = math::Vec2::One(),
-            .color = math::Color::Blue,
-        });
-
         renderer.drawTexture({
             .texture = rat,
             .position = playerPosition,
@@ -64,13 +58,13 @@ int main() {
             .color = math::Color::White
         });
 
-        renderer.drawCodepoint({
+        renderer.drawText({
             .texture = fontTexture,
             .font = font,
-            .codepoint = 'h',
+            .text = "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ\n0123456789",
             .fontSize = 24.0f,
             .position = math::Vec2::Zero(),
-            .color = math::Color::Black
+            .color = math::Color::Black,
         });
 
         renderer.endWorld();

@@ -144,8 +144,8 @@ namespace backend {
         drawTextureTo({
             .texture = command.texture,
             .position = {
-                command.position.x + (static_cast<float>(glyph.offsetX) * scale) + glyphWidth * 0.5f,
-                command.position.y + (static_cast<float>(glyph.offsetY) * scale) + glyphHeight * 0.5f
+                command.position.x + glyph.offsetX * scale + glyphWidth * 0.5f,
+                command.position.y + glyph.offsetY * scale - glyphHeight * 0.5f
             },
             .size = {glyphWidth, glyphHeight},
             .uv = {
@@ -158,9 +158,71 @@ namespace backend {
         }, mFontPipeline, mTextureBatch);
     }
 
-    void OpenGLRenderer::drawCodepoints(const DrawCodepointsCommand& command) {}
+    void OpenGLRenderer::drawCodepoints(const DrawCodepointsCommand& command) {
+        float textOffsetX = 0.0f;
+        float textOffsetY = 0.0f;
 
-    void OpenGLRenderer::drawText(const DrawTextCommand& command) {}
+        float scale = (command.fontSize * mFontPixelScale) / static_cast<float>(command.font.baseSize);
+
+        for (unicode::codepoint codepoint : command.codepoints) {
+            const Glyph& glyph = command.font.glyphs[command.font.getGlyphIndex(codepoint)];
+
+            if (codepoint == '\n') {
+                textOffsetX = 0.0f;
+                textOffsetY -= (command.fontSize + command.textLineSpacing) * mFontPixelScale;
+            } else {
+                if (codepoint != ' ' && codepoint != '\t') {
+                    drawCodepoint({
+                        .texture = command.texture,
+                        .font = command.font,
+                        .codepoint = codepoint,
+                        .fontSize = command.fontSize,
+                        .position = {command.position.x + textOffsetX, command.position.y + textOffsetY},
+                        .color = command.color
+                    });
+                }
+
+                if (glyph.advanceX == 0) textOffsetX += glyph.atlasBounds.width() * scale + command.spacing * mFontPixelScale;
+                else textOffsetX += glyph.advanceX * scale + command.spacing * mFontPixelScale;
+            }
+        }
+    }
+
+    void OpenGLRenderer::drawText(const DrawTextCommand& command) {
+        size_t textLength = command.textLength ? command.textLength : strlen(command.text);
+
+        float textOffsetX = 0.0f;
+        float textOffsetY = 0.0f;
+
+        float scale = (command.fontSize * mFontPixelScale) / static_cast<float>(command.font.baseSize);
+
+        for (size_t i = 0; i < textLength;) {
+            int codepointSize = 0;
+            unicode::codepoint codepoint = unicode::GetNextCodepoint(command.text + i, &codepointSize);
+            const Glyph& glyph = command.font.glyphs[command.font.getGlyphIndex(codepoint)];
+
+            if (codepoint == '\n') {
+                textOffsetX = 0.0f;
+                textOffsetY -= (command.fontSize + command.textLineSpacing) * mFontPixelScale;
+            } else {
+                if (codepoint != ' ' && codepoint != '\t') {
+                    drawCodepoint({
+                        .texture = command.texture,
+                        .font = command.font,
+                        .codepoint = codepoint,
+                        .fontSize = command.fontSize,
+                        .position = {command.position.x + textOffsetX, command.position.y + textOffsetY},
+                        .color = command.color
+                    });
+                }
+
+                if (glyph.advanceX == 0) textOffsetX += glyph.atlasBounds.width() * scale + command.spacing * mFontPixelScale;
+                else textOffsetX += glyph.advanceX * scale + command.spacing * mFontPixelScale;
+            }
+
+            i += codepointSize;
+        }
+    }
 
     OpenGLRenderer::Pipeline::Pipeline(OpenGLRenderer& renderer)
         : mRenderer(renderer) {}

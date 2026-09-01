@@ -212,6 +212,14 @@ namespace math {
 
         constexpr RectT() = default;
         constexpr RectT(T left, T right, T top, T bottom) : left(left), right(right), top(top), bottom(bottom) {}
+
+        constexpr T width() const {
+            return right - left;
+        }
+
+        constexpr T height() const {
+            return bottom - top;
+        }
     };
 
     using RectI = RectT<int>;

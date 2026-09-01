@@ -4,6 +4,7 @@
 #define UNNAMEDGAME_ENGINE_BACKEND_RENDERER_H
 
 #include "engine/util/math.h"
+#include "engine/util/unicode.h"
 
 namespace backend {
     struct Camera2D {
@@ -92,7 +93,7 @@ namespace backend {
     struct DrawCodepointCommand {
         TextureHandle texture; // gpu version of font.atlas
         Font font;
-        uint32_t codepoint;
+        unicode::codepoint codepoint;
         float fontSize;
         math::Vec2 position;
         math::Color color;
@@ -101,9 +102,10 @@ namespace backend {
     struct DrawCodepointsCommand {
         TextureHandle texture; // gpu version of font.atlas
         Font font;
-        std::span<uint32_t> codepoints;
+        std::span<unicode::codepoint> codepoints;
         float fontSize;
-        float spacing;
+        float spacing = 1.0f;
+        float textLineSpacing = 2.0f;
         math::Vec2 position;
         math::Color color;
     };
@@ -112,8 +114,10 @@ namespace backend {
         TextureHandle texture; // gpu version of font.atlas
         Font font;
         const char* text;
+        size_t textLength = 0;
         float fontSize;
-        float spacing;
+        float spacing = 1.0f;
+        float textLineSpacing = 2.0f;
         math::Vec2 position;
         math::Color color;
     };

@@ -67,8 +67,8 @@ namespace backend {
         delete[] image.pixels;
     }
 
-    Font StbAssetProvider::loadFont(const char* path, int size, const uint32_t* codepoints, int codepointCount) {
-        static constexpr uint32_t defaultCodepoints[] = {
+    Font StbAssetProvider::loadFont(const char* path, int size, const unicode::codepoint* codepoints, int codepointCount) {
+        static constexpr unicode::codepoint defaultCodepoints[] = {
             // Printable ASCII
             32, 33, 34, 35, 36, 37, 38, 39,
             40, 41, 42, 43, 44, 45, 46, 47,
@@ -177,9 +177,9 @@ namespace backend {
 
             glyphs[i] = {
                 .codepoint = codepoints[i],
-                .offsetX = static_cast<int>(packedChar.xoff),
-                .offsetY = static_cast<int>(packedChar.yoff),
-                .advanceX = static_cast<int>(packedChar.xadvance),
+                .offsetX = packedChar.xoff,
+                .offsetY = -packedChar.yoff,
+                .advanceX = packedChar.xadvance,
                 .atlasBounds = {
                     static_cast<float>(packedChar.x0),
                     static_cast<float>(packedChar.x1),

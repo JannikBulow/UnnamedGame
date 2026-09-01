@@ -4,9 +4,9 @@
 #define UNNAMEDGAME_ENGINE_BACKEND_ASSET_PROVIDER_H
 
 #include "engine/util/math.h"
+#include "engine/util/unicode.h"
 
 #include <cstdint>
-#include <cstddef>
 
 namespace backend {
     enum class ImageFormat {
@@ -23,10 +23,10 @@ namespace backend {
     };
 
     struct Glyph {
-        uint32_t codepoint; // unicode
-        int offsetX;
-        int offsetY;
-        int advanceX;
+        unicode::codepoint codepoint; // unicode
+        float offsetX;
+        float offsetY;
+        float advanceX;
         math::Rect atlasBounds;
     };
 
@@ -36,7 +36,7 @@ namespace backend {
         Image atlas;
         Glyph* glyphs;
 
-        int getGlyphIndex(uint32_t codepoint) const {
+        int getGlyphIndex(unicode::codepoint codepoint) const {
             int index = 0;
             int fallbackIndex = 0;
 
@@ -61,7 +61,7 @@ namespace backend {
         virtual Image loadImage(const char* path) = 0;
         virtual void unloadImage(Image image) = 0;
 
-        virtual Font loadFont(const char* path, int size, const uint32_t* codepoints = nullptr, int codepointCount = 0) = 0;
+        virtual Font loadFont(const char* path, int size, const unicode::codepoint* codepoints = nullptr, int codepointCount = 0) = 0;
         virtual void unloadFont(Font font) = 0;
     };
 }
