@@ -70,6 +70,8 @@ endif()
 
 find_package(OpenGL REQUIRED)
 
+option(UNNAMEDGAME_TARGET_MULTITHREADED "Enable/disable certain features such as atomics and internal mutexes to make the engine multithreading safe. Keep off for single threaded usages to improve performance" OFF)
+
 set(SOURCES
     src/backends/glfw/input_provider.cpp
     src/backends/glfw/window.cpp
@@ -107,6 +109,8 @@ set(HEADERS
     include/engine/util/timer.h
     include/engine/util/unicode.h
     include/engine/resource/texture.h
+
+    include/engine/compile_options.h
 )
 
 source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SOURCES} ${HEADERS})
@@ -116,6 +120,10 @@ add_library(UnnamedGame::Engine ALIAS unnamedgame-engine)
 
 target_compile_definitions(unnamedgame-engine PRIVATE UNNAMEDGAME_RL_DEFAULT_DOMAIN="${PROJECT_SOURCE_DIR}/assets")
 target_compile_definitions(unnamedgame-engine PRIVATE UNNAMEDGAME_RL_DEFAULT_DOMAINsv="${PROJECT_SOURCE_DIR}/assets"sv)
+
+if (UNNAMEDGAME_TARGET_MULTITHREADED)
+    target_compile_definitions(unnamedgame-engine PUBLIC UNNAMEDGAME_TARGET_MULTITHREADED=1)
+endif()
 
 target_include_directories(unnamedgame-engine
     PUBLIC
