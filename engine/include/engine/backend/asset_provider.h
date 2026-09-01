@@ -7,6 +7,7 @@
 #include "engine/util/unicode.h"
 
 #include <cstdint>
+#include <cstring>
 
 namespace backend {
     enum class ImageFormat {
@@ -51,6 +52,55 @@ namespace backend {
 
             if (index == 0 && glyphs[0].codepoint != codepoint) index = fallbackIndex;
             return index;
+        }
+
+        math::Vec2 measureText(const char* text, float fontSize, float spacing = 1.0f, float textLineSpacing = 2.0f) const {
+            if (!text || !text[0]) return math::Vec2::Zero();
+
+            size_t textLength = strlen(text);
+            size_t tempByteCounter = 0;
+            size_t byteCounter = 0;
+
+            float textWidth = 0.0f;
+            float tempTextWidth = 0.0f;
+            float textHeight = fontSize;
+
+            float scale = fontSize / static_cast<float>(baseSize);
+
+            unicode::codepoint codepoint = 0;
+            int index = 0;
+
+            for (size_t i = 0; i < textLength;) {
+                byteCounter++;
+
+                int codepointSize = 0;
+                codepoint = unicode::GetNextCodepoint(text + i, &codepointSize);
+                index = getGlyphIndex(codepoint);
+
+                const Glyph& glyph = glyphs[index];
+
+                i += codepointSize;
+
+                if (codepoint != '\n') {
+                    if (glyph.advanceX > 0) textWidth += glyph.advanceX;
+                    else textWidth += glyph.atlasBounds.width() + glyph.offsetX;
+                } else {
+                    if (textWidth > tempTextWidth) tempTextWidth = textWidth;
+                    byteCounter = 0;
+                    textWidth = 0.0f;
+
+                    textHeight += fontSize + textLineSpacing;
+                }
+
+                if (byteCounter > tempByteCounter) tempByteCounter = byteCounter;
+            }
+
+            if (textWidth > tempTextWidth) tempTextWidth = textWidth;
+
+            return {
+                tempTextWidth * scale + static_cast<float>(tempByteCounter - 1) * scale,
+                textHeight
+            };
         }
     };
 
