@@ -65,6 +65,7 @@ int main() {
             .fontSize = 24.0f,
             .position = math::Vec2::Zero(),
             .color = math::Color::Black,
+            .centerOrigin = true
         });
 
         renderer.endWorld();

@@ -143,7 +143,7 @@ namespace backend {
 
         drawTextureTo({
             .texture = command.texture,
-            .position = {
+            .position = command.centerOrigin ? command.position : math::Vec2{
                 command.position.x + glyph.offsetX * scale + glyphWidth * 0.5f,
                 command.position.y + glyph.offsetY * scale - glyphHeight * 0.5f
             },
@@ -159,6 +159,14 @@ namespace backend {
     }
 
     void OpenGLRenderer::drawCodepoints(const DrawCodepointsCommand& command) {
+        math::Vec2 pen = command.position;
+
+        if (command.centerOrigin) {
+            math::Vec2 sizePixels = command.font.measureCodepoints(command.codepoints, command.fontSize, command.spacing, command.textLineSpacing);
+            math::Vec2 sizeWorld = sizePixels * mFontPixelScale;
+            pen -= sizeWorld * 0.5f;
+        }
+
         float textOffsetX = 0.0f;
         float textOffsetY = 0.0f;
 
@@ -177,7 +185,7 @@ namespace backend {
                         .font = command.font,
                         .codepoint = codepoint,
                         .fontSize = command.fontSize,
-                        .position = {command.position.x + textOffsetX, command.position.y + textOffsetY},
+                        .position = {pen.x + textOffsetX, pen.y + textOffsetY},
                         .color = command.color
                     });
                 }
@@ -190,6 +198,14 @@ namespace backend {
 
     void OpenGLRenderer::drawText(const DrawTextCommand& command) {
         size_t textLength = command.textLength ? command.textLength : strlen(command.text);
+
+        math::Vec2 pen = command.position;
+
+        if (command.centerOrigin) {
+            math::Vec2 sizePixels = command.font.measureText(command.text, command.fontSize, command.spacing, command.textLineSpacing);
+            math::Vec2 sizeWorld = sizePixels * mFontPixelScale;
+            pen -= sizeWorld * 0.5f;
+        }
 
         float textOffsetX = 0.0f;
         float textOffsetY = 0.0f;
@@ -211,7 +227,7 @@ namespace backend {
                         .font = command.font,
                         .codepoint = codepoint,
                         .fontSize = command.fontSize,
-                        .position = {command.position.x + textOffsetX, command.position.y + textOffsetY},
+                        .position = {pen.x + textOffsetX, pen.y + textOffsetY},
                         .color = command.color
                     });
                 }

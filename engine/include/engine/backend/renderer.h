@@ -97,6 +97,7 @@ namespace backend {
         float fontSize;
         math::Vec2 position;
         math::Color color;
+        bool centerOrigin = false;
     };
 
     struct DrawCodepointsCommand {
@@ -108,6 +109,7 @@ namespace backend {
         float textLineSpacing = 2.0f;
         math::Vec2 position;
         math::Color color;
+        bool centerOrigin = false;
     };
 
     struct DrawTextCommand {
@@ -120,6 +122,7 @@ namespace backend {
         float textLineSpacing = 2.0f;
         math::Vec2 position;
         math::Color color;
+        bool centerOrigin = false;
     };
 
     class IRenderer {
