@@ -8,6 +8,7 @@
 
 #include <cstdint>
 #include <cstring>
+#include <span>
 
 namespace backend {
     enum class ImageFormat {
@@ -99,6 +100,46 @@ namespace backend {
 
             return {
                 tempTextWidth * scale + static_cast<float>(tempByteCounter - 1) * scale,
+                textHeight
+            };
+        }
+
+        math::Vec2 measureCodepoints(std::span<const unicode::codepoint> codepoints, float fontSize, float spacing = 1.0f, float textLineSpacing = 2.0f) const {
+            if (codepoints.empty()) return math::Vec2::Zero();
+
+            float textWidth = 0.0f;
+            float tempTextWidth = 0.0f;
+
+            int tempGlyphCounter = 0;
+            int glyphCounter = 0;
+
+            float textHeight = fontSize;
+            float scale = fontSize / static_cast<float>(baseSize);
+
+            for (unicode::codepoint codepoint : codepoints) {
+                const Glyph& glyph = glyphs[getGlyphIndex(codepoint)];
+
+                if (codepoint != '\n') {
+                    glyphCounter++;
+
+                    if (glyph.advanceX > 0) textWidth += glyph.advanceX;
+                    else textWidth += glyph.atlasBounds.width() + glyph.offsetX;
+                } else {
+                    if (textWidth > tempTextWidth) tempTextWidth = textWidth;
+
+                    textWidth = 0.0f;
+                    glyphCounter = 0;
+
+                    textHeight += fontSize + textLineSpacing;
+                }
+
+                if (glyphCounter > tempGlyphCounter) tempGlyphCounter = glyphCounter;
+            }
+
+            if (textWidth > tempTextWidth) tempTextWidth = textWidth;
+
+            return {
+                tempTextWidth * scale + static_cast<float>(tempGlyphCounter - 1) * spacing,
                 textHeight
             };
         }
