@@ -19,6 +19,9 @@ int main() {
     backend::OpenGLRenderer renderer(device, window);
     backend::StbAssetProvider assetProvider;
 
+    backend::Font font = assetProvider.loadFont("/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 12, nullptr, 0);
+    backend::TextureHandle fontTexture = device.createTexture(font.atlas);
+
     backend::Image ratImage = assetProvider.loadImage("/home/jannik/Downloads/rat.png");
     backend::TextureHandle rat = device.createTexture(ratImage);
     assetProvider.unloadImage(ratImage);
@@ -61,6 +64,15 @@ int main() {
             .color = math::Color::White
         });
 
+        renderer.drawCodepoint({
+            .texture = fontTexture,
+            .font = font,
+            .codepoint = 'h',
+            .fontSize = 24.0f,
+            .position = math::Vec2::Zero(),
+            .color = math::Color::Black
+        });
+
         renderer.endWorld();
 
         renderer.beginUI();
@@ -74,6 +86,9 @@ int main() {
     }
 
     device.destroyTexture(rat);
+    device.destroyTexture(fontTexture);
+
+    assetProvider.unloadFont(font);
 
     return 0;
 }
