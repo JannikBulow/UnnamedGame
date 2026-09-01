@@ -67,6 +67,10 @@ namespace backend {
                 position.y + relative.y * pixelsPerWorldY
             };
         }
+
+        float pixelsPerWorldUnit(math::Vec2 viewportSize) const {
+            return viewportSize.y / (worldHeight / zoom);
+        }
     };
 
     struct DrawRectCommand {

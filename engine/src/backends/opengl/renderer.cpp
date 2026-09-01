@@ -88,6 +88,8 @@ namespace backend {
         mRenderQueue.setViews(view);
 
         mDevice.setBlendMode(BlendMode::Alpha);
+
+        mFontPixelScale = 1.0f / camera.pixelsPerWorldUnit(viewportSize);
     }
 
     void OpenGLRenderer::endWorld() {
@@ -105,6 +107,8 @@ namespace backend {
 
         mRenderQueue.setProjections(projection);
         mRenderQueue.setViews(math::Mat4::Identity());
+
+        mFontPixelScale = 1.0f;
     }
 
     void OpenGLRenderer::endUI() {
@@ -133,7 +137,7 @@ namespace backend {
     void OpenGLRenderer::drawCodepoint(const DrawCodepointCommand& command) {
         const Glyph& glyph = command.font.glyphs[command.font.getGlyphIndex(command.codepoint)];
 
-        float scale = command.fontSize / static_cast<float>(command.font.baseSize);
+        float scale = (command.fontSize * mFontPixelScale) / static_cast<float>(command.font.baseSize);
         float glyphWidth = (glyph.atlasBounds.right - glyph.atlasBounds.left) * scale;
         float glyphHeight = (glyph.atlasBounds.bottom - glyph.atlasBounds.top) * scale;
 

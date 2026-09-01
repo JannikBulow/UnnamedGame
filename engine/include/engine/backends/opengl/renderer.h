@@ -138,6 +138,8 @@ namespace backend {
 
         RenderQueue mRenderQueue;
 
+        float mFontPixelScale = 1.0f;
+
         static std::span<const VertexAttribute> CreateRectAttributes();
         static std::span<const VertexAttribute> CreateTextureAttributes();
 
