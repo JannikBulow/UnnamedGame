@@ -81,6 +81,8 @@ set(SOURCES
 
     src/backends/stb/asset_provider.cpp
 
+    src/resource/texture.cpp
+
     src/util/resource_location.cpp
     src/util/unicode.cpp
 )
