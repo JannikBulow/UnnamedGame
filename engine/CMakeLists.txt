@@ -80,6 +80,7 @@ set(SOURCES
     src/backends/stb/asset_provider.cpp
 
     src/util/resource_location.cpp
+    src/util/unicode.cpp
 )
 
 set(HEADERS
@@ -103,6 +104,7 @@ set(HEADERS
     include/engine/util/math.h
     include/engine/util/resource_location.h
     include/engine/util/timer.h
+    include/engine/util/unicode.h
 )
 
 source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SOURCES} ${HEADERS})
