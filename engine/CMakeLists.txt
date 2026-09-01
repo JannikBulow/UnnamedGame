@@ -106,6 +106,7 @@ set(HEADERS
     include/engine/util/resource_location.h
     include/engine/util/timer.h
     include/engine/util/unicode.h
+    include/engine/resource/texture.h
 )
 
 source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SOURCES} ${HEADERS})
