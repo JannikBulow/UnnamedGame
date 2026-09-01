@@ -44,7 +44,7 @@ int main() {
         camera.position = playerPosition;
 
         renderer.beginFrame();
-        renderer.clearScreen(math::Color::LightGray);
+        renderer.clearScreen(math::Color::White);
 
         renderer.beginWorld(camera);
 
@@ -57,8 +57,8 @@ int main() {
         renderer.drawTexture({
             .texture = rat,
             .position = playerPosition,
-            .size = {1, 1},
-            .color = {255, 255, 255, 255}
+            .size = {1, 1.5},
+            .color = math::Color::White
         });
 
         renderer.endWorld();
