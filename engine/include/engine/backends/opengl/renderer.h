@@ -64,6 +64,7 @@ namespace backend {
             // ONLY CALL AFTER bind()!!!!!
             // doesn't store its texture cpu side to avoid wasting uploads so caller must manually do that
             void setTexture(TextureHandle texture);
+            void setSampler(SamplerHandle sampler);
 
         private:
             OpenGLRenderer& mRenderer;
@@ -102,6 +103,7 @@ namespace backend {
             Pipeline* pipeline;
             Batch* batch;
             TextureHandle texture;
+            SamplerHandle sampler;
             uint32_t vertexOffset;
             uint32_t vertexCount;
         };
@@ -113,7 +115,7 @@ namespace backend {
             void setProjections(const math::Mat4& projection);
             void setViews(const math::Mat4& view);
 
-            void submit(Pipeline& pipeline, Batch& batch, TextureHandle texture, uint32_t vertexCount, const void* vertices);
+            void submit(Pipeline& pipeline, Batch& batch, TextureHandle texture, SamplerHandle sampler, uint32_t vertexCount, const void* vertices);
             void flush();
 
         private:

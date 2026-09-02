@@ -83,6 +83,7 @@ namespace backend {
 
     struct DrawTextureCommand {
         TextureHandle texture;
+        SamplerHandle sampler = nullptr;
         math::Vec2 position;
         math::Vec2 size;
         math::Rect uv = {0, 1, 1, 0};
@@ -92,6 +93,7 @@ namespace backend {
 
     struct DrawCodepointCommand {
         TextureHandle texture; // gpu version of font.atlas
+        SamplerHandle sampler = nullptr;
         Font font;
         unicode::codepoint codepoint;
         float fontSize;
@@ -102,6 +104,7 @@ namespace backend {
 
     struct DrawCodepointsCommand {
         TextureHandle texture; // gpu version of font.atlas
+        SamplerHandle sampler = nullptr;
         Font font;
         std::span<unicode::codepoint> codepoints;
         float fontSize;
@@ -114,6 +117,7 @@ namespace backend {
 
     struct DrawTextCommand {
         TextureHandle texture; // gpu version of font.atlas
+        SamplerHandle sampler = nullptr;
         Font font;
         const char* text;
         size_t textLength = 0;

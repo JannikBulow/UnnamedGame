@@ -127,7 +127,7 @@ namespace backend {
         for (int i = 0; i < QUAD_CORNERS.size(); i++) {
             vertices[i] = {TransformPoint(model, QUAD_CORNERS[i]), math::Color4F(command.color)};
         }
-        mRenderQueue.submit(mRectPipeline, mRectBatch, nullptr, 6, vertices.data());
+        mRenderQueue.submit(mRectPipeline, mRectBatch, nullptr, nullptr, 6, vertices.data());
     }
 
     void OpenGLRenderer::drawTexture(const DrawTextureCommand& command) {
@@ -301,6 +301,10 @@ namespace backend {
         mRenderer.mDevice.bindTexture(0, texture);
     }
 
+    void OpenGLRenderer::Pipeline::setSampler(SamplerHandle sampler) {
+        mRenderer.mDevice.bindSampler(0, sampler);
+    }
+
     OpenGLRenderer::Batch::Batch(OpenGLRenderer& renderer)
         : mRenderer(renderer) {}
 
@@ -388,7 +392,7 @@ namespace backend {
         }
     }
 
-    void OpenGLRenderer::RenderQueue::submit(Pipeline& pipeline, Batch& batch, TextureHandle texture, uint32_t vertexCount, const void* vertices) {
+    void OpenGLRenderer::RenderQueue::submit(Pipeline& pipeline, Batch& batch, TextureHandle texture, SamplerHandle sampler, uint32_t vertexCount, const void* vertices) {
         std::optional<uint32_t> offset = batch.submit(vertexCount, vertices);
         if (!offset) { // batch full, try again
             flush();
@@ -405,7 +409,7 @@ namespace backend {
             }
         }
 
-        mCommands.emplace_back(&pipeline, &batch, texture, *offset, vertexCount);
+        mCommands.emplace_back(&pipeline, &batch, texture, sampler, *offset, vertexCount);
     }
 
     void OpenGLRenderer::RenderQueue::flush() {
@@ -414,6 +418,7 @@ namespace backend {
 
         Pipeline* currentPipeline = nullptr;
         TextureHandle currentTexture = nullptr;
+        SamplerHandle currentSampler = nullptr;
         for (auto& command : mCommands) {
             if (currentPipeline != command.pipeline) {
                 command.pipeline->bind();
@@ -424,6 +429,11 @@ namespace backend {
             if (command.texture && currentTexture != command.texture) {
                 command.pipeline->setTexture(command.texture);
                 currentTexture = command.texture;
+            }
+
+            if (command.sampler && currentSampler != command.sampler) {
+                command.pipeline->setSampler(command.sampler);
+                currentSampler = command.sampler;
             }
 
             command.batch->draw(command.vertexOffset, command.vertexCount);
@@ -497,7 +507,7 @@ namespace backend {
             vertices[i] = {TransformPoint(model, QUAD_CORNERS[i]), uv, math::Color4F(command.color)};
         }
 
-        mRenderQueue.submit(pipeline, batch, command.texture, 6, vertices.data());
+        mRenderQueue.submit(pipeline, batch, command.texture, command.sampler, 6, vertices.data());
     }
 
     void OpenGLRenderer::warmupShaders() {
