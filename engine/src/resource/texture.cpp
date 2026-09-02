@@ -5,10 +5,10 @@
 #include "engine/resource/resource_manager.h"
 
 namespace engine {
-    TextureResource::TextureResource(ResourceManager* resourceManager, util::ResourceLocation* location, SamplerDescriptor* samplerDesc)
+    TextureResource::TextureResource(ResourceManager* resourceManager)
         : resourceManager(resourceManager)
-        , location(location)
-        , samplerDesc(samplerDesc)
+        , location(nullptr)
+        , samplerDesc(nullptr)
         , strongReferences(0)
         , image(std::nullopt)
         , textureHandle(nullptr) {}
@@ -19,11 +19,15 @@ namespace engine {
     }
 
     void TextureResource::addStrongReference() {
-        strongReferences++;
+        if (strongReferences++ == 1) {
+            resourceManager->markUsed(*this);
+        }
     }
 
     void TextureResource::removeStrongReference() {
-        strongReferences--;
+        if (--strongReferences == 0) {
+            resourceManager->markUnused(*this);
+        }
     }
 
     void TextureResource::ensureCPUResidence() {

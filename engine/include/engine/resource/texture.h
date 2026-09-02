@@ -26,16 +26,18 @@ namespace engine {
     struct TextureResource {
         ResourceManager* resourceManager;
 
-        util::ResourceLocation* location;
-        SamplerDescriptor* samplerDesc;
+        const util::ResourceLocation* location;
+        const SamplerDescriptor* samplerDesc;
 
         options::Atomic<uint32_t> strongReferences;
 
         std::optional<backend::Image> image;
         backend::TextureHandle textureHandle;
-        backend::SamplerHandle samplerHandle;
+        backend::SamplerHandle samplerHandle; // not owned!!!
 
-        TextureResource(ResourceManager* resourceManager, util::ResourceLocation* location, SamplerDescriptor* samplerDesc);
+        size_t estimatedTextureSize = 0; // has a value when textureHandle does. is garbage value otherwise
+
+        explicit TextureResource(ResourceManager* resourceManager);
         ~TextureResource();
 
         void addStrongReference();
