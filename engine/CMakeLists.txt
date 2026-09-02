@@ -92,6 +92,7 @@ set(HEADERS
     include/engine/backends/glfw/window.h
 
     include/engine/backend/asset_provider.h
+    include/engine/backend/backend.h
     include/engine/backend/graphics_device.h
     include/engine/backend/input_provider.h
     include/engine/backend/renderer.h
