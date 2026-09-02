@@ -21,4 +21,22 @@ namespace util {
     };
 }
 
+template<>
+struct std::hash<util::ResourceLocation> {
+    size_t operator()(const util::ResourceLocation& location) const {
+        constexpr size_t basis = sizeof(size_t) == 8 ? 14695981039346656037ULL : 2166136261u;
+        constexpr size_t prime = sizeof(size_t) == 8 ? 1099511628211ULL : 16777216u;
+
+        const unsigned char* s = reinterpret_cast<const unsigned char*>(location.cstr());
+        size_t h = basis;
+
+        while (*s) {
+            h ^= static_cast<unsigned char>(*s++);
+            h *= prime;
+        }
+
+        return h;
+    }
+};
+
 #endif //UNNAMEDGAME_ENGINE_UTIL_RESOURCE_LOCATION_H
