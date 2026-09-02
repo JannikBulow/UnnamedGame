@@ -14,6 +14,10 @@ namespace util {
     ResourceLocation::ResourceLocation(std::string_view domain, std::string_view resource)
         : mPath(CreatePath(domain, resource)) {}
 
+    bool ResourceLocation::operator==(const ResourceLocation& other) const {
+        return strcmp(mPath.get(), other.mPath.get()) == 0;
+    }
+
     const char* ResourceLocation::cstr() const {
         return mPath.get();
     }
