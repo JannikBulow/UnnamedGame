@@ -14,15 +14,24 @@
 namespace engine {
     class ResourceManager;
 
+    struct SamplerDescriptor {
+        backend::TextureFilter filter;
+        backend::TextureWrap wrap;
+    };
+
     struct TextureResource {
         ResourceManager* resourceManager;
-        util::ResourceLocation location;
+
+        util::ResourceLocation* location;
+        SamplerDescriptor* samplerDesc;
+
         options::Atomic<uint32_t> strongReferences;
 
         std::optional<backend::Image> image;
         backend::TextureHandle textureHandle;
+        backend::SamplerHandle samplerHandle;
 
-        TextureResource(ResourceManager* resourceManager, util::ResourceLocation location);
+        TextureResource(ResourceManager* resourceManager, util::ResourceLocation* location, SamplerDescriptor* samplerDesc);
         ~TextureResource();
 
         void addStrongReference();
@@ -81,9 +90,23 @@ namespace engine {
             return mResource->textureHandle;
         }
 
+        backend::SamplerHandle sampler() const {
+            mResource->ensureGPUResidence();
+            return mResource->samplerHandle;
+        }
+
     private:
         TextureResource* mResource;
     };
 }
+
+template<>
+struct std::hash<engine::SamplerDescriptor> {
+    size_t operator()(const engine::SamplerDescriptor& samplerDescriptor) const {
+        size_t h1 = std::hash<backend::TextureFilter>()(samplerDescriptor.filter);
+        size_t h2 = std::hash<backend::TextureWrap>()(samplerDescriptor.wrap);
+        return h1 ^ (h2 + 0x9e3779b9 + (h1 << 6) + (h1 >> 2));
+    }
+};
 
 #endif //UNNAMEDGAME_ENGINE_RESOURCE_TEXTURE_H
