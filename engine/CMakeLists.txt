@@ -114,6 +114,7 @@ set(HEADERS
     include/engine/resource/texture.h
 
     include/engine/compile_options.h
+    include/engine/resource/resource_manager.h
 )
 
 source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SOURCES} ${HEADERS})
