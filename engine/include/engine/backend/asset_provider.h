@@ -22,6 +22,22 @@ namespace backend {
         int height;
         ImageFormat format;
         uint8_t* pixels;
+
+        size_t getSizeBytes() const {
+            int bytesPerPixel = 4;
+            switch (format) {
+                case ImageFormat::R8:
+                    bytesPerPixel = 1;
+                    break;
+                case ImageFormat::RGB8:
+                    bytesPerPixel = 3;
+                    break;
+                case ImageFormat::RGBA8:
+                    bytesPerPixel = 4;
+                    break;
+            }
+            return width * height * bytesPerPixel;
+        }
     };
 
     struct Glyph {
