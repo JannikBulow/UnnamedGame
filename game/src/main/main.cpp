@@ -1,5 +1,7 @@
 // Copyright 2026 Jannik Laugmand Bülow
 
+#include <engine/backend/backend.h>
+
 #include <engine/backends/glfw/input_provider.h>
 #include <engine/backends/glfw/window.h>
 
@@ -7,6 +9,8 @@
 #include <engine/backends/opengl/graphics_device.h>
 
 #include <engine/backends/stb/asset_provider.h>
+
+#include <engine/resource/resource_manager.h>
 
 #include <engine/util/timer.h>
 
@@ -22,9 +26,17 @@ int main() {
     backend::Font font = assetProvider.loadFont("/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 24, nullptr, 0);
     backend::TextureHandle fontTexture = device.createTexture(font.atlas);
 
-    backend::Image ratImage = assetProvider.loadImage("/home/jannik/Downloads/rat.png");
-    backend::TextureHandle rat = device.createTexture(ratImage);
-    assetProvider.unloadImage(ratImage);
+    backend::Backend backend = {
+        .assetProvider = assetProvider,
+        .gpu = device,
+        .inputProvider = inputProvider,
+        .renderer = renderer,
+        .window = window,
+    };
+
+    engine::ResourceManager resourceManager(backend);
+
+    engine::Texture rat = resourceManager.createTexture({"/home/jannik/Downloads", "rat.png"});
 
     util::Timer<std::chrono::steady_clock> timer;
     timer.setLimit(165);
@@ -52,7 +64,7 @@ int main() {
         renderer.beginWorld(camera);
 
         renderer.drawTexture({
-            .texture = rat,
+            .texture = rat.handle(),
             .position = playerPosition,
             .size = {1, 1.5},
             .color = math::Color::White
@@ -80,7 +92,6 @@ int main() {
         std::cout << timer.getRate() << " fps\n";
     }
 
-    device.destroyTexture(rat);
     device.destroyTexture(fontTexture);
 
     assetProvider.unloadFont(font);
