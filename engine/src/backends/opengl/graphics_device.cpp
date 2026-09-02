@@ -168,6 +168,57 @@ namespace backend {
         glUniform4f(id, fcolor.r, fcolor.g, fcolor.b, fcolor.a);
     }
 
+    SamplerHandle OpenGLGraphicsDevice::createSampler(TextureFilter filter, TextureWrap wrap) {
+        GLuint sampler = 0;
+        glGenSamplers(1, &sampler);
+
+        GLint glFilter = ToGLFilter(filter);
+        GLint glWrap = ToGLWrap(wrap);
+
+        glSamplerParameteri(sampler, GL_TEXTURE_MIN_FILTER, glFilter);
+        glSamplerParameteri(sampler, GL_TEXTURE_MAG_FILTER, glFilter);
+        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_S, glWrap);
+        glSamplerParameteri(sampler, GL_TEXTURE_WRAP_T, glWrap);
+
+        return mSamplers.create(sampler);
+    }
+
+    void OpenGLGraphicsDevice::destroySampler(SamplerHandle sampler) {
+        GLuint id = mSamplers.get(sampler);
+        glDeleteSamplers(1, &id);
+        mSamplers.destroy(sampler);
+
+        for (auto& bound : mBoundSamplers) {
+            if (bound == sampler) bound = nullptr;
+        }
+    }
+
+    void OpenGLGraphicsDevice::configureSampler(SamplerHandle sampler, std::optional<TextureFilter> filter, std::optional<TextureWrap> wrap) {
+        GLuint id = mSamplers.get(sampler);
+
+        if (filter) {
+            GLint glFilter = ToGLFilter(*filter);
+            glSamplerParameteri(id, GL_TEXTURE_MIN_FILTER, glFilter);
+            glSamplerParameteri(id, GL_TEXTURE_MAG_FILTER, glFilter);
+        }
+
+        if (wrap) {
+            GLint glWrap = ToGLWrap(*wrap);
+            glSamplerParameteri(id, GL_TEXTURE_WRAP_S, glWrap);
+            glSamplerParameteri(id, GL_TEXTURE_WRAP_T, glWrap);
+        }
+    }
+
+    void OpenGLGraphicsDevice::bindSampler(unsigned slot, SamplerHandle sampler) {
+        if (slot < mBoundSamplers.size() && mBoundSamplers[slot] == sampler) return;
+
+        GLuint id = mSamplers.get(sampler);
+
+        glBindSampler(slot, id);
+
+        mBoundSamplers[slot] = sampler;
+    }
+
     TextureHandle OpenGLGraphicsDevice::createTexture(Image image) {
         GLuint texture = 0;
 
@@ -213,31 +264,13 @@ namespace backend {
     }
 
     void OpenGLGraphicsDevice::bindTexture(unsigned slot, TextureHandle texture) {
-        if (slot < MAX_TEXTURE_SLOTS && mBoundTextures[slot] == texture) return;
+        if (slot < mBoundTextures.size() && mBoundTextures[slot] == texture) return;
 
         GLuint id = mTextures.get(texture);
         glActiveTexture(GL_TEXTURE0 + slot);
         glBindTexture(GL_TEXTURE_2D, id);
 
         if (slot < MAX_TEXTURE_SLOTS) mBoundTextures[slot] = texture;
-    }
-
-    void OpenGLGraphicsDevice::setTextureFilter(TextureHandle texture, TextureFilter filter) {
-        GLuint id = mTextures.get(texture);
-        glBindTexture(GL_TEXTURE_2D, id);
-
-        GLint glFilter = ToGLFilter(filter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glFilter);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glFilter);
-    }
-
-    void OpenGLGraphicsDevice::setTextureWrap(TextureHandle texture, TextureWrap wrap) {
-        GLuint id = mTextures.get(texture);
-        glBindTexture(GL_TEXTURE_2D, id);
-
-        GLint glWrap = ToGLWrap(wrap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, glWrap);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, glWrap);
     }
 
     void OpenGLGraphicsDevice::setBlendMode(BlendMode mode) {

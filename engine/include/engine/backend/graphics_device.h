@@ -12,6 +12,7 @@
 
 namespace backend {
     using BufferHandle = util::Handle<struct BufferHandleTag>;
+    using SamplerHandle = util::Handle<struct SamplerHandleTag>;
     using ShaderHandle = util::Handle<struct ShaderHandleTag>;
     using TextureHandle = util::Handle<struct TextureHandleTag>;
     using UniformHandle = util::Handle<struct UniformHandleTag>;
@@ -100,11 +101,14 @@ namespace backend {
         virtual void setUniform(UniformHandle uniform, math::Mat4F value) = 0;
         virtual void setUniform(UniformHandle uniform, math::Color4B value) = 0;
 
+        virtual SamplerHandle createSampler(TextureFilter filter = TextureFilter::Linear, TextureWrap wrap = TextureWrap::Repeat) = 0;
+        virtual void destroySampler(SamplerHandle sampler) = 0;
+        virtual void configureSampler(SamplerHandle sampler, std::optional<TextureFilter> filter, std::optional<TextureWrap> wrap) = 0;
+        virtual void bindSampler(unsigned slot, SamplerHandle sampler) = 0;
+
         virtual TextureHandle createTexture(Image image) = 0;
         virtual void destroyTexture(TextureHandle texture) = 0;
         virtual void bindTexture(unsigned slot, TextureHandle texture) = 0;
-        virtual void setTextureFilter(TextureHandle texture, TextureFilter filter) = 0;
-        virtual void setTextureWrap(TextureHandle texture, TextureWrap wrap) = 0;
 
         virtual void setBlendMode(BlendMode mode) = 0;
 

@@ -37,11 +37,14 @@ namespace backend {
         void setUniform(UniformHandle uniform, math::Mat4F value) override;
         void setUniform(UniformHandle uniform, math::Color4B value) override;
 
+        SamplerHandle createSampler(TextureFilter filter, TextureWrap wrap) override;
+        void destroySampler(SamplerHandle sampler) override;
+        void configureSampler(SamplerHandle sampler, std::optional<TextureFilter> filter, std::optional<TextureWrap> wrap) override;
+        void bindSampler(unsigned slot, SamplerHandle sampler) override;
+
         TextureHandle createTexture(Image image) override;
         void destroyTexture(TextureHandle texture) override;
         void bindTexture(unsigned slot, TextureHandle texture) override;
-        void setTextureFilter(TextureHandle texture, TextureFilter filter) override;
-        void setTextureWrap(TextureHandle texture, TextureWrap wrap) override;
 
         void setBlendMode(BlendMode mode) override;
 
@@ -53,6 +56,7 @@ namespace backend {
         static constexpr size_t MAX_TEXTURE_SLOTS = 16;
 
         util::HandleStorage<uint, BufferHandleTag> mBuffers;
+        util::HandleStorage<uint, SamplerHandleTag> mSamplers;
         util::HandleStorage<uint, ShaderHandleTag> mShaders;
         util::HandleStorage<uint, TextureHandleTag> mTextures;
         util::HandleStorage<int, UniformHandleTag> mUniforms;
@@ -60,6 +64,7 @@ namespace backend {
 
         ShaderHandle mBoundShader = nullptr;
         VertexArrayHandle mBoundVertexArray = nullptr;
+        std::array<SamplerHandle, MAX_TEXTURE_SLOTS> mBoundSamplers{};
         std::array<TextureHandle, MAX_TEXTURE_SLOTS> mBoundTextures{};
         BlendMode mCurrentBlendMode = BlendMode::None;
         bool mBlendModeInitialized = false;
