@@ -17,6 +17,10 @@ namespace engine {
     struct SamplerDescriptor {
         backend::TextureFilter filter;
         backend::TextureWrap wrap;
+
+        bool operator==(const SamplerDescriptor& other) const {
+            return filter == other.filter && wrap == other.wrap;
+        }
     };
 
     struct TextureResource {
