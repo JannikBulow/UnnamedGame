@@ -23,7 +23,7 @@ namespace util {
     }
 
     std::unique_ptr<const char[]> ResourceLocation::CreatePath(std::string_view domain, std::string_view resource) {
-        int needSep = domain.ends_with(std::filesystem::path::preferred_separator) ? 1 : 0;
+        int needSep = domain.ends_with(std::filesystem::path::preferred_separator) ? 0 : 1;
         size_t size = domain.size() + needSep + resource.size();
         auto path = std::make_unique<char[]>(size);
 
