@@ -76,6 +76,8 @@ set(SOURCES
     src/backends/glfw/input_provider.cpp
     src/backends/glfw/window.cpp
 
+    src/backends/miniaudio/audio_device.cpp
+
     src/backends/opengl/graphics_device.cpp
     src/backends/opengl/renderer.cpp
 
@@ -89,21 +91,27 @@ set(SOURCES
 )
 
 set(HEADERS
-    include/engine/backends/glfw/input_provider.h
-    include/engine/backends/glfw/window.h
-
     include/engine/backend/asset_provider.h
+    include/engine/backend/audio_device.h
     include/engine/backend/backend.h
     include/engine/backend/graphics_device.h
     include/engine/backend/input_provider.h
     include/engine/backend/renderer.h
     include/engine/backend/window.h
 
+    include/engine/backends/glfw/input_provider.h
+    include/engine/backends/glfw/window.h
+
+    include/engine/backends/miniaudio/audio_device.h
+
     include/engine/backends/opengl/graphics_device.h
     include/engine/backends/opengl/renderer.h
     include/engine/backends/opengl/shader_programs.h
 
     include/engine/backends/stb/asset_provider.h
+
+    include/engine/resource/resource_manager.h
+    include/engine/resource/texture.h
 
     include/engine/util/exceptions.h
     include/engine/util/handle.h
@@ -112,10 +120,8 @@ set(HEADERS
     include/engine/util/resource_location.h
     include/engine/util/timer.h
     include/engine/util/unicode.h
-    include/engine/resource/texture.h
 
     include/engine/compile_options.h
-    include/engine/resource/resource_manager.h
 )
 
 source_group(TREE ${PROJECT_SOURCE_DIR} FILES ${SOURCES} ${HEADERS})

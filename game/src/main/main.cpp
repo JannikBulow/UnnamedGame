@@ -5,6 +5,8 @@
 #include <engine/backends/glfw/input_provider.h>
 #include <engine/backends/glfw/window.h>
 
+#include <engine/backends/miniaudio/audio_device.h>
+
 #include <engine/backends/opengl/renderer.h>
 #include <engine/backends/opengl/graphics_device.h>
 
@@ -22,17 +24,25 @@ int main() {
     backend::OpenGLGraphicsDevice device;
     backend::OpenGLRenderer renderer(device, window);
     backend::StbAssetProvider assetProvider;
+    backend::MiniaudioAudioDevice audioDevice;
 
     backend::Font font = assetProvider.loadFont("/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 24, nullptr, 0);
     backend::TextureHandle fontTexture = device.createTexture(font.atlas);
 
     backend::Backend backend = {
         .assetProvider = assetProvider,
+        .audio = audioDevice,
         .gpu = device,
         .inputProvider = inputProvider,
         .renderer = renderer,
         .window = window,
     };
+
+    backend::Audio audio = assetProvider.loadAudio("/home/jannik/Downloads/intro.wav");
+    backend::AudioVoiceHandle voice = audioDevice.createVoice();
+    audioDevice.setAudio(voice, audio);
+
+    audioDevice.play(voice);
 
     engine::ResourceManager resourceManager(backend);
 
@@ -63,6 +73,12 @@ int main() {
 
         renderer.beginWorld(camera);
 
+        renderer.drawRect({
+            .position = math::Vec2::Zero(),
+            .size = math::Vec2::One(),
+            .color = math::Color::Blue
+        });
+
         renderer.drawTexture({
             .texture = rat.handle(),
             .position = playerPosition,
@@ -73,9 +89,9 @@ int main() {
         renderer.drawText({
             .texture = fontTexture,
             .font = font,
-            .text = "abcdefghijklmnopqrstuvwxyz\nABCDEFGHIJKLMNOPQRSTUVWXYZ\n0123456789",
+            .text = "playa",
             .fontSize = 24.0f,
-            .position = math::Vec2::Zero(),
+            .position = {playerPosition.x, playerPosition.y + 1.0f},
             .color = math::Color::Black,
             .centerOrigin = true
         });

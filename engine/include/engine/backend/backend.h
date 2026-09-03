@@ -4,6 +4,7 @@
 #define UNNAMEDGAME_ENGINE_BACKEND_BACKEND_H
 
 #include "engine/backend/asset_provider.h"
+#include "engine/backend/audio_device.h"
 #include "engine/backend/graphics_device.h"
 #include "engine/backend/input_provider.h"
 #include "engine/backend/renderer.h"
@@ -12,6 +13,7 @@
 namespace backend {
     struct Backend {
         IAssetProvider& assetProvider;
+        IAudioDevice& audio;
         IGraphicsDevice& gpu;
         IInputProvider& inputProvider;
         IRenderer& renderer;
