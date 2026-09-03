@@ -12,6 +12,23 @@ namespace engine {
         }
     }
 
+    Font ResourceManager::createFont(util::ResourceLocation location, int fontSize, const unicode::codepoint* codepoints, int codePointCount, std::optional<SamplerDescriptor> sampler) {
+        FontKey key(std::move(location), std::move(sampler), fontSize, codepoints, codePointCount);
+        auto it = mFonts.find(key);
+        if (it != mFonts.end()) return Font(&it->second);
+
+        auto [it2, success] = mFonts.emplace(std::move(key), this);
+        if (!success) throw util::GameException();
+
+        it2->second.location = &it2->first.location;
+        if (it2->first.sampler) it2->second.samplerDesc = &*it2->first.sampler;
+        it2->second.fontSize = fontSize;
+        it2->second.codepoints = codepoints; // TODO: clone later. lazy now
+        it2->second.codePointCount = codePointCount;
+
+        return Font(&it2->second);
+    }
+
     Sound ResourceManager::createSound(util::ResourceLocation location) {
         auto it = mSounds.find(location);
         if (it != mSounds.end()) return Sound(&it->second);
@@ -49,6 +66,16 @@ namespace engine {
         return sampler;
     }
 
+    void ResourceManager::markUsed(const FontResource& resource) {
+        if (resource.font) mCPUMemoryProfile.potentialReclaimable -= resource.font->getSizeBytes();
+        if (resource.textureHandle) mGPUMemoryProfile.potentialReclaimable -= resource.estimatedTextureSize;
+    }
+
+    void ResourceManager::markUnused(const FontResource& resource) {
+        if (resource.font) mCPUMemoryProfile.potentialReclaimable += resource.font->getSizeBytes();
+        if (resource.textureHandle) mGPUMemoryProfile.potentialReclaimable += resource.estimatedTextureSize;
+    }
+
     void ResourceManager::markUsed(const SoundResource& resource) {
         if (resource.audio) mCPUMemoryProfile.potentialReclaimable -= resource.audio->getSizeBytes();
     }
@@ -65,6 +92,32 @@ namespace engine {
     void ResourceManager::markUnused(const TextureResource& resource) {
         if (resource.image) mCPUMemoryProfile.potentialReclaimable += resource.image->getSizeBytes();
         if (resource.textureHandle) mGPUMemoryProfile.potentialReclaimable += resource.estimatedTextureSize;
+    }
+
+    void ResourceManager::realizeFontCPU(FontResource& resource) {
+        resource.font = mBackend.assetProvider.loadFont(resource.location->cstr(), resource.fontSize, resource.codepoints, resource.codePointCount);
+        mCPUMemoryProfile.used += resource.font->getSizeBytes();
+    }
+
+    void ResourceManager::realizeFontGPU(FontResource& resource) {
+        if (!resource.font) realizeFontCPU(resource); // both the cpu and gpu sides of the font are needed to draw with it, so this is better
+
+        resource.textureHandle = mBackend.gpu.createTexture(resource.font->atlas);
+        resource.samplerHandle = getSampler(*resource.samplerDesc);
+        resource.estimatedTextureSize = resource.font->atlas.getSizeBytes();
+
+        mGPUMemoryProfile.used += resource.estimatedTextureSize;
+    }
+
+    void ResourceManager::evictFontCPU(FontResource& resource) {
+        mBackend.assetProvider.unloadFont(*resource.font);
+        resource.font = std::nullopt;
+    }
+
+    void ResourceManager::evictFontGPU(FontResource& resource) {
+        mBackend.gpu.destroyTexture(resource.textureHandle);
+        resource.textureHandle = nullptr;
+        resource.estimatedTextureSize = 0;
     }
 
     void ResourceManager::realizeSound(SoundResource& resource) {
@@ -102,6 +155,7 @@ namespace engine {
         }
 
         resource.textureHandle = mBackend.gpu.createTexture(image);
+        resource.samplerHandle = getSampler(*resource.samplerDesc);
         resource.estimatedTextureSize = imageSizeBytes;
 
         if (!cachedImage) {

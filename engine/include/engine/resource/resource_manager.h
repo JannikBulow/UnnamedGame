@@ -5,6 +5,7 @@
 
 #include "engine/backend/backend.h"
 
+#include "engine/resource/font.h"
 #include "engine/resource/sound.h"
 #include "engine/resource/texture.h"
 
@@ -37,6 +38,7 @@ namespace engine {
         const MemoryProfile& cpuMemoryProfile() const { return mCPUMemoryProfile; }
         const MemoryProfile& gpuMemoryProfile() const { return mGPUMemoryProfile; }
 
+        Font createFont(util::ResourceLocation location, int fontSize, const unicode::codepoint* codepoints = nullptr, int codePointCount = 0, std::optional<SamplerDescriptor> sampler = std::nullopt);
         Sound createSound(util::ResourceLocation location);
         Texture createTexture(util::ResourceLocation location, std::optional<SamplerDescriptor> sampler = std::nullopt);
 
@@ -59,6 +61,39 @@ namespace engine {
             };
         };
 
+        // vile creation from hell
+        struct FontKey {
+            util::ResourceLocation location;
+            std::optional<SamplerDescriptor> sampler;
+            int size;
+            const unicode::codepoint* codepoints;
+            int codepointCount;
+
+            bool operator==(const FontKey& other) const {
+                return location == other.location && sampler == other.sampler && size == other.size && codepointCount == other.codepointCount && memcmp(codepoints, other.codepoints, codepointCount * sizeof(unicode::codepoint)) == 0;
+            }
+
+            struct Hash {
+                size_t operator()(const FontKey& key) const {
+                    auto combine = [](size_t& seed, size_t hash) {
+                        seed ^= hash + 0x9e3779b9 + (seed << 6) + (seed >> 2);
+                    };
+
+                    size_t seed = 0;
+
+                    combine(seed, std::hash<util::ResourceLocation>{}(key.location));
+                    if (key.sampler) combine(seed, std::hash<SamplerDescriptor>{}(*key.sampler));
+                    combine(seed, std::hash<int>{}(key.size));
+                    if (key.codepoints) {
+                        combine(seed, unicode::Hash(key.codepoints, key.codepointCount));
+                        combine(seed, std::hash<int>{}(key.codepointCount));
+                    }
+
+                    return seed;
+                }
+            };
+        };
+
         backend::Backend& mBackend;
 
         MemoryProfile mCPUMemoryProfile{};
@@ -66,10 +101,14 @@ namespace engine {
 
         std::unordered_map<SamplerDescriptor, backend::SamplerHandle> mSamplers;
 
+        std::unordered_map<FontKey, FontResource, FontKey::Hash> mFonts;
         std::unordered_map<util::ResourceLocation, SoundResource> mSounds;
         std::unordered_map<TextureKey, TextureResource, TextureKey::Hash> mTextures;
 
         backend::SamplerHandle getSampler(SamplerDescriptor desc);
+
+        void markUsed(const FontResource& resource);
+        void markUnused(const FontResource& resource);
 
         void markUsed(const SoundResource& resource);
         void markUnused(const SoundResource& resource);
@@ -78,6 +117,11 @@ namespace engine {
         void markUnused(const TextureResource& resource);
 
         // these don't check for existing values or auto destroy and will cause memory leaks if used incorrectly
+
+        void realizeFontCPU(FontResource& resource);
+        void realizeFontGPU(FontResource& resource); // this specific function will check and realize the cpu font
+        void evictFontCPU(FontResource& resource);
+        void evictFontGPU(FontResource& resource);
 
         void realizeSound(SoundResource& resource);
         void evictSound(SoundResource& resource);
