@@ -29,7 +29,36 @@ namespace util {
 
     template<class T, class H = T>
     class HandleStorage {
+        struct Slot {
+            std::optional<T> value;
+            uint32_t generation;
+        };
+
     public:
+        template<class C, class It>
+        class IteratorBase {
+            friend class HandleStorage;
+        public:
+            C& operator*() { return mIterator->value.value(); }
+            C* operator->() { return &mIterator->value.value(); }
+            IteratorBase& operator++() {
+                while (++mIterator != mEnd && !mIterator->value.has_value()) {}
+                return *this;
+            }
+
+            bool operator==(const IteratorBase& other) const { return mIterator == other.mIterator; }
+            bool operator!=(const IteratorBase& other) const { return !(*this == other); }
+
+        private:
+            It mIterator;
+            It mEnd;
+
+            IteratorBase(It it, It end) : mIterator(it), mEnd(end) {}
+        };
+
+        using Iterator = IteratorBase<T, typename std::vector<Slot>::iterator>;
+        using ConstIterator = IteratorBase<const T, typename std::vector<Slot>::const_iterator>;
+
         template<class... Args>
         Handle<H> create(Args&&... args) {
             uint32_t index;
@@ -67,12 +96,14 @@ namespace util {
             return slot.value.value();
         }
 
-    private:
-        struct Slot {
-            std::optional<T> value;
-            uint32_t generation;
-        };
+        Iterator begin() { return {mValues.begin(), mValues.end()}; }
+        Iterator end() { return {mValues.end(), mValues.end()}; }
+        ConstIterator begin() const { return {mValues.begin(), mValues.end()}; }
+        ConstIterator end() const { return {mValues.end(), mValues.end()}; }
+        ConstIterator cbegin() const { return {mValues.cbegin(), mValues.cbegin()}; }
+        ConstIterator cend() const { return {mValues.cend(), mValues.cend()}; }
 
+    private:
         std::vector<Slot> mValues;
         std::vector<uint32_t> mFreeList;
     };
