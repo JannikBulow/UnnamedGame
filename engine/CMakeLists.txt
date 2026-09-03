@@ -84,6 +84,7 @@ set(SOURCES
     src/backends/stb/asset_provider.cpp
 
     src/resource/resource_manager.cpp
+    src/resource/sound.cpp
     src/resource/texture.cpp
 
     src/util/resource_location.cpp
@@ -111,6 +112,7 @@ set(HEADERS
     include/engine/backends/stb/asset_provider.h
 
     include/engine/resource/resource_manager.h
+    include/engine/resource/sound.h
     include/engine/resource/texture.h
 
     include/engine/util/exceptions.h
