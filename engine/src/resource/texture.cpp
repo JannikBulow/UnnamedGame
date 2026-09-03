@@ -19,7 +19,7 @@ namespace engine {
     }
 
     void TextureResource::addStrongReference() {
-        if (strongReferences++ == 1) {
+        if (++strongReferences == 1) {
             resourceManager->markUsed(*this);
         }
     }
