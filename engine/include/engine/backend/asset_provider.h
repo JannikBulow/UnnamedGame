@@ -22,6 +22,10 @@ namespace backend {
         uint32_t channels;
         uint64_t frameCount;
         float* samples;
+
+        size_t getSizeBytes() const {
+            return frameCount * channels * sizeof(float);
+        }
     };
 
     enum class ImageFormat {
