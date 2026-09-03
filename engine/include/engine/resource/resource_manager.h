@@ -13,7 +13,7 @@
 
 namespace engine {
     class ResourceManager {
-        friend class TextureResource;
+        friend struct TextureResource;
     public:
         struct MemoryProfile {
             size_t used = 0;
