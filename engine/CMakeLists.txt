@@ -135,7 +135,7 @@ target_compile_definitions(unnamedgame-engine PRIVATE UNNAMEDGAME_RL_DEFAULT_DOM
 target_compile_definitions(unnamedgame-engine PRIVATE UNNAMEDGAME_RL_DEFAULT_DOMAINsv="${PROJECT_SOURCE_DIR}/assets"sv)
 
 if (UNNAMEDGAME_TARGET_MULTITHREADED)
-    target_compile_definitions(unnamedgame-engine PUBLIC UNNAMEDGAME_TARGET_MULTITHREADED=1)
+    target_compile_definitions(unnamedgame-engine PUBLIC UNNAMEDGAME_TARGET_MULTITHREADED)
 endif()
 
 target_include_directories(unnamedgame-engine
