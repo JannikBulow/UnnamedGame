@@ -29,4 +29,21 @@ namespace unicode {
 
         return '?';
     }
+
+    size_t Hash(const codepoint* codepoints, size_t codepointCount) {
+        constexpr size_t basis = sizeof(size_t) == 8 ? 14695981039346656037ULL : 2166136261u;
+        constexpr size_t prime = sizeof(size_t) == 8 ? 1099511628211ULL : 16777216u;
+
+        size_t h = basis;
+
+        for (size_t i = 0; i < codepointCount; i++) {
+            for (int j = 0; i < sizeof(codepoint); j++) {
+                unsigned char byte = static_cast<unsigned char>(codepoints[i] >> (i * 8));
+                h ^= byte;
+                h *= prime;
+            }
+        }
+
+        return h;
+    }
 }
