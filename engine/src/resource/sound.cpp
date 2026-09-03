@@ -11,12 +11,22 @@ namespace engine {
         , audio(std::nullopt) {}
 
     SoundResource::~SoundResource() {
-        if (audio)
+        if (audio) resourceManager->evictSound(*this);
     }
 
-    void SoundResource::addStrongReference() {}
+    void SoundResource::addStrongReference() {
+        if (++strongReferences == 1) {
+            resourceManager->markUsed(*this);
+        }
+    }
 
-    void SoundResource::removeStrongReference() {}
+    void SoundResource::removeStrongReference() {
+        if (--strongReferences == 0) {
+            resourceManager->markUnused(*this);
+        }
+    }
 
-    void SoundResource::ensureResidency() {}
+    void SoundResource::ensureResidency() {
+        if (!audio) [[unlikely]] resourceManager->realizeSound(*this);
+    }
 }

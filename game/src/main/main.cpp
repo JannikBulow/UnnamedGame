@@ -38,15 +38,14 @@ int main() {
         .window = window,
     };
 
-    backend::Audio audio = assetProvider.loadAudio("/home/jannik/Downloads/intro.wav");
-    backend::AudioVoiceHandle voice = audioDevice.createVoice();
-    audioDevice.setAudio(voice, audio);
-
-    audioDevice.play(voice);
-
     engine::ResourceManager resourceManager(backend);
 
+    engine::Sound intro = resourceManager.createSound({"/home/jannik/Downloads", "intro.wav"});
     engine::Texture rat = resourceManager.createTexture({"/home/jannik/Downloads", "rat.png"});
+
+    backend::AudioVoiceHandle voice = audioDevice.createVoice();
+    audioDevice.setAudio(voice, intro.audio());
+    audioDevice.play(voice);
 
     util::Timer<std::chrono::steady_clock> timer;
     timer.setLimit(165);
