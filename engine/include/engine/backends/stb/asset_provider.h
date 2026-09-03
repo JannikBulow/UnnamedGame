@@ -11,6 +11,9 @@ namespace backend {
     public:
         StbAssetProvider();
 
+        Audio loadAudio(const char* path) override;
+        void unloadAudio(Audio audio) override;
+
         Image loadImage(const char* path) override;
         void unloadImage(Image image) override;
 

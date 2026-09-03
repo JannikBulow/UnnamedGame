@@ -11,6 +11,19 @@
 #include <span>
 
 namespace backend {
+    enum class AudioSampleFormat {
+        S8,
+        S16,
+        S32F
+    };
+
+    struct Audio {
+        uint32_t sampleRate;
+        uint32_t channels;
+        uint64_t frameCount;
+        float* samples;
+    };
+
     enum class ImageFormat {
         R8,
         RGB8,
@@ -164,6 +177,9 @@ namespace backend {
     class IAssetProvider {
     public:
         virtual ~IAssetProvider() = default;
+
+        virtual Audio loadAudio(const char* path) = 0;
+        virtual void unloadAudio(Audio audio) = 0;
 
         virtual Image loadImage(const char* path) = 0;
         virtual void unloadImage(Image image) = 0;

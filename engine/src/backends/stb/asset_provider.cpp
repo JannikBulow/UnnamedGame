@@ -4,6 +4,8 @@
 
 #include "engine/util/exceptions.h"
 
+#include <miniaudio.h>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
@@ -16,6 +18,37 @@
 namespace backend {
     StbAssetProvider::StbAssetProvider() {
         stbi_set_flip_vertically_on_load(true);
+    }
+
+    Audio StbAssetProvider::loadAudio(const char* path) {
+        ma_decoder decoder;
+        ma_decoder_config config = ma_decoder_config_init(ma_format_f32, 0, 0);
+        if (ma_decoder_init_file(path, &config, &decoder) != MA_SUCCESS) {
+            throw util::GameException("failed to load audio file");
+        }
+
+        ma_uint64 frameCount;
+        float* decoded = nullptr;
+
+        ma_result result = ma_decode_file(path, &config, &frameCount, reinterpret_cast<void**>(&decoded));
+        if (result != MA_SUCCESS) {
+            ma_decoder_uninit(&decoder);
+            throw util::GameException("failed to decode audio");
+        }
+
+        Audio audio{};
+        audio.channels = decoder.outputChannels;
+        audio.sampleRate = decoder.outputSampleRate;
+        audio.frameCount = frameCount;
+        audio.samples = decoded;
+
+        ma_decoder_uninit(&decoder);
+
+        return audio;
+    }
+
+    void StbAssetProvider::unloadAudio(Audio audio) {
+        ma_free(audio.samples, nullptr);
     }
 
     Image StbAssetProvider::loadImage(const char* path) {
