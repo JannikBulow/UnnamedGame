@@ -112,6 +112,7 @@ set(HEADERS
     include/engine/backends/stb/asset_provider.h
 
     include/engine/resource/resource_manager.h
+    include/engine/resource/sampler_descriptor.h
     include/engine/resource/sound.h
     include/engine/resource/texture.h
 
