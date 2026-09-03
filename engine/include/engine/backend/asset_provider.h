@@ -71,6 +71,10 @@ namespace backend {
         Image atlas;
         Glyph* glyphs;
 
+        size_t getSizeBytes() const {
+            return glyphCount * sizeof(Glyph) + atlas.getSizeBytes();
+        }
+
         int getGlyphIndex(unicode::codepoint codepoint) const {
             int index = 0;
             int fallbackIndex = 0;
