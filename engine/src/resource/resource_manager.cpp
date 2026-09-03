@@ -12,6 +12,18 @@ namespace engine {
         }
     }
 
+    Sound ResourceManager::createSound(util::ResourceLocation location) {
+        auto it = mSounds.find(location);
+        if (it != mSounds.end()) return Sound(&it->second);
+
+        auto [it2, success] = mSounds.emplace(std::move(location), this);
+        if (!success) throw util::GameException();
+
+        it2->second.location = &it2->first;
+
+        return Sound(&it2->second);
+    }
+
     Texture ResourceManager::createTexture(util::ResourceLocation location, std::optional<SamplerDescriptor> sampler) {
         TextureKey key(std::move(location), std::move(sampler));
         auto it = mTextures.find(key);
@@ -37,6 +49,14 @@ namespace engine {
         return sampler;
     }
 
+    void ResourceManager::markUsed(const SoundResource& resource) {
+        if (resource.audio) mCPUMemoryProfile.potentialReclaimable -= resource.audio->getSizeBytes();
+    }
+
+    void ResourceManager::markUnused(const SoundResource& resource) {
+        if (resource.audio) mCPUMemoryProfile.potentialReclaimable += resource.audio->getSizeBytes();
+    }
+
     void ResourceManager::markUsed(const TextureResource& resource) {
         if (resource.image) mCPUMemoryProfile.potentialReclaimable -= resource.image->getSizeBytes();
         if (resource.textureHandle) mGPUMemoryProfile.potentialReclaimable -= resource.estimatedTextureSize;
@@ -45,6 +65,16 @@ namespace engine {
     void ResourceManager::markUnused(const TextureResource& resource) {
         if (resource.image) mCPUMemoryProfile.potentialReclaimable += resource.image->getSizeBytes();
         if (resource.textureHandle) mGPUMemoryProfile.potentialReclaimable += resource.estimatedTextureSize;
+    }
+
+    void ResourceManager::realizeSound(SoundResource& resource) {
+        resource.audio = mBackend.assetProvider.loadAudio(resource.location->cstr());
+        mCPUMemoryProfile.used += resource.audio->getSizeBytes();
+    }
+
+    void ResourceManager::evictSound(SoundResource& resource) {
+        mBackend.assetProvider.unloadAudio(*resource.audio);
+        resource.audio = std::nullopt;
     }
 
     void ResourceManager::realizeTextureCPU(TextureResource& resource) {

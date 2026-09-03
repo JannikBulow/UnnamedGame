@@ -5,6 +5,7 @@
 
 #include "engine/backend/backend.h"
 
+#include "engine/resource/sound.h"
 #include "engine/resource/texture.h"
 
 #include "engine/util/object_allocator.h"
@@ -13,6 +14,7 @@
 
 namespace engine {
     class ResourceManager {
+        friend struct SoundResource;
         friend struct TextureResource;
     public:
         struct MemoryProfile {
@@ -35,6 +37,7 @@ namespace engine {
         const MemoryProfile& cpuMemoryProfile() const { return mCPUMemoryProfile; }
         const MemoryProfile& gpuMemoryProfile() const { return mGPUMemoryProfile; }
 
+        Sound createSound(util::ResourceLocation location);
         Texture createTexture(util::ResourceLocation location, std::optional<SamplerDescriptor> sampler = std::nullopt);
 
     private:
@@ -63,14 +66,21 @@ namespace engine {
 
         std::unordered_map<SamplerDescriptor, backend::SamplerHandle> mSamplers;
 
+        std::unordered_map<util::ResourceLocation, SoundResource> mSounds;
         std::unordered_map<TextureKey, TextureResource, TextureKey::Hash> mTextures;
 
         backend::SamplerHandle getSampler(SamplerDescriptor desc);
+
+        void markUsed(const SoundResource& resource);
+        void markUnused(const SoundResource& resource);
 
         void markUsed(const TextureResource& resource);
         void markUnused(const TextureResource& resource);
 
         // these don't check for existing values or auto destroy and will cause memory leaks if used incorrectly
+
+        void realizeSound(SoundResource& resource);
+        void evictSound(SoundResource& resource);
 
         void realizeTextureCPU(TextureResource& resource);
         void realizeTextureGPU(TextureResource& resource); // this will take care of the CPU texture on its own. it may or may not cache it as well
