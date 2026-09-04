@@ -74,6 +74,10 @@ namespace engine {
             return mResource->audio.value();
         }
 
+        bool operator==(const Sound& other) const {
+            return mResource == other.mResource;
+        }
+
     private:
         SoundResource* mResource;
     };
