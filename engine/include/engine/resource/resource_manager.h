@@ -15,6 +15,7 @@
 
 namespace engine {
     class ResourceManager {
+        friend struct FontResource;
         friend struct SoundResource;
         friend struct TextureResource;
     public:
