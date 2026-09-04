@@ -52,7 +52,8 @@ int main() {
 
     engine::Sound intro = resourceManager.createSound({"/home/jannik/Downloads", "intro.wav"});
     engine::Font font = resourceManager.createFont({"/usr/share/fonts/liberation", "LiberationSans-Regular.ttf"}, 24);
-    engine::Texture rat = resourceManager.createTexture({"/home/jannik/Downloads", "rat.png"});
+
+    engine::Sprite rat(resourceManager.createTexture({"/home/jannik/Downloads", "rat.png"}));
 
     audio.play(intro);
 
@@ -76,7 +77,7 @@ int main() {
             },
             [&](float dt) {
                 renderer.drawRect(math::Vec2::Zero(), math::Vec2::One(), math::Color::Blue);
-                renderer.drawTexture(rat, playerPosition, {1.0f, 1.5f});
+                renderer.drawSprite(rat, playerPosition, {1.0f, 1.5f});
                 renderer.drawText(font, "playa", {playerPosition.x, playerPosition.y + 1.0f}, 24, math::Color::Black, true);
             },
             [&](float dt) {
