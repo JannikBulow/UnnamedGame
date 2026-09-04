@@ -31,6 +31,10 @@ namespace engine {
         });
     }
 
+    void Renderer::drawSprite(const Sprite& sprite, math::Vec2 position, math::Vec2 size, math::Color color, float rotation) {
+        drawTexture(sprite.texture(), position, size, color, rotation, sprite.uv());
+    }
+
     void Renderer::drawText(const Font& font, const std::string& text, math::Vec2 position, float fontSize, math::Color color, bool centerOrigin) {
         float spacing = fontSize / 12;
         drawText(font, text, position, fontSize, spacing, 2.0f, color, centerOrigin);
