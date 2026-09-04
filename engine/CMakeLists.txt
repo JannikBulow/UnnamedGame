@@ -85,6 +85,7 @@ set(SOURCES
 
     src/render/frame_controller.cpp
     src/render/renderer.cpp
+    src/render/sprite.cpp
 
     src/resource/font.cpp
     src/resource/resource_manager.cpp
@@ -120,6 +121,7 @@ set(HEADERS
     include/engine/render/camera.h
     include/engine/render/frame_controller.h
     include/engine/render/renderer.h
+    include/engine/render/sprite.h
 
     include/engine/resource/font.h
     include/engine/resource/resource_manager.h
