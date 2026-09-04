@@ -16,6 +16,13 @@ namespace backend {
         ma_engine_uninit(&mEngine);
     }
 
+    //TODO: implement master volume
+    float MiniaudioAudioDevice::getMasterVolume() {
+        return 1.0f;
+    }
+
+    void MiniaudioAudioDevice::setMasterVolume(float volume) {}
+
     AudioVoiceHandle MiniaudioAudioDevice::createVoice() {
         Voice voice;
         memset(&voice.sound, 0, sizeof(voice.sound));
@@ -69,6 +76,24 @@ namespace backend {
 
         voice.soundInitialized = true;
         voice.audio = audio;
+    }
+
+    bool MiniaudioAudioDevice::isPlaying(AudioVoiceHandle _voice) {
+        Voice& voice = mVoices.get(_voice);
+        if (!voice.soundInitialized) return false;
+        return ma_sound_is_playing(&voice.sound);
+    }
+
+    bool MiniaudioAudioDevice::isPaused(AudioVoiceHandle _voice) {
+        Voice& voice = mVoices.get(_voice);
+        if (!voice.soundInitialized) return false;
+        return voice.paused;
+    }
+
+    bool MiniaudioAudioDevice::isFinished(AudioVoiceHandle _voice) {
+        Voice& voice = mVoices.get(_voice);
+        if (!voice.soundInitialized) return true;
+        return ma_sound_at_end(&voice.sound);
     }
 
     void MiniaudioAudioDevice::play(AudioVoiceHandle _voice) {

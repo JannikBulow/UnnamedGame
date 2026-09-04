@@ -14,10 +14,17 @@ namespace backend {
     public:
         virtual ~IAudioDevice() = default;
 
+        virtual float getMasterVolume() = 0;
+        virtual void setMasterVolume(float volume) = 0;
+
         virtual AudioVoiceHandle createVoice() = 0;
         virtual void destroyVoice(AudioVoiceHandle voice) = 0;
 
         virtual void setAudio(AudioVoiceHandle voice, Audio audio) = 0;
+
+        virtual bool isPlaying(AudioVoiceHandle voice) = 0;
+        virtual bool isPaused(AudioVoiceHandle voice) = 0;
+        virtual bool isFinished(AudioVoiceHandle voice) = 0;
 
         virtual void play(AudioVoiceHandle voice) = 0;
         virtual void stop(AudioVoiceHandle voice) = 0;

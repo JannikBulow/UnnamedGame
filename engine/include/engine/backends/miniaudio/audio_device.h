@@ -13,10 +13,17 @@ namespace backend {
         MiniaudioAudioDevice();
         ~MiniaudioAudioDevice() override;
 
+        float getMasterVolume() override;
+        void setMasterVolume(float volume) override;
+
         AudioVoiceHandle createVoice() override;
         void destroyVoice(AudioVoiceHandle voice) override;
 
         void setAudio(AudioVoiceHandle voice, Audio audio) override;
+
+        bool isPlaying(AudioVoiceHandle voice) override;
+        bool isPaused(AudioVoiceHandle voice) override;
+        bool isFinished(AudioVoiceHandle voice) override;
 
         void play(AudioVoiceHandle voice) override;
         void stop(AudioVoiceHandle voice) override;
