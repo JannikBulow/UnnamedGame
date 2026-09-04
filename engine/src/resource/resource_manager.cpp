@@ -103,7 +103,7 @@ namespace engine {
         if (!resource.font) realizeFontCPU(resource); // both the cpu and gpu sides of the font are needed to draw with it, so this is better
 
         resource.textureHandle = mBackend.gpu.createTexture(resource.font->atlas);
-        resource.samplerHandle = getSampler(*resource.samplerDesc);
+        if (resource.samplerDesc) resource.samplerHandle = getSampler(*resource.samplerDesc);
         resource.estimatedTextureSize = resource.font->atlas.getSizeBytes();
 
         mGPUMemoryProfile.used += resource.estimatedTextureSize;
@@ -155,7 +155,7 @@ namespace engine {
         }
 
         resource.textureHandle = mBackend.gpu.createTexture(image);
-        resource.samplerHandle = getSampler(*resource.samplerDesc);
+        if (resource.samplerDesc) resource.samplerHandle = getSampler(*resource.samplerDesc);
         resource.estimatedTextureSize = imageSizeBytes;
 
         if (!cachedImage) {
