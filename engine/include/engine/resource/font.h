@@ -92,7 +92,7 @@ namespace engine {
             return mResource->font->atlas;
         }
 
-        backend::TextureHandle handle() const {
+        backend::TextureHandle texture() const {
             mResource->ensureGPUResidence();
             return mResource->textureHandle;
         }
