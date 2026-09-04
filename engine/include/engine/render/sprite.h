@@ -5,10 +5,12 @@
 
 #include "engine/resource/texture.h"
 
+#include <optional>
+
 namespace engine {
     class Sprite {
     public:
-        Sprite(Texture texture, math::Rect pixelBounds);
+        explicit Sprite(Texture texture, std::optional<math::Rect> pixelBounds = std::nullopt);
 
         const Texture& texture() const { return mTexture; }
         math::Rect uv() const { return mUV; }
