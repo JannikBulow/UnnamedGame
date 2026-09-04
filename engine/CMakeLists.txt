@@ -83,6 +83,7 @@ set(SOURCES
 
     src/backends/stb/asset_provider.cpp
 
+    src/render/frame_controller.cpp
     src/render/renderer.cpp
 
     src/resource/font.cpp
@@ -115,6 +116,7 @@ set(HEADERS
     include/engine/backends/stb/asset_provider.h
 
     include/engine/render/camera.h
+    include/engine/render/frame_controller.h
     include/engine/render/renderer.h
 
     include/engine/resource/font.h

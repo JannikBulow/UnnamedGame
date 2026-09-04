@@ -12,6 +12,7 @@
 
 #include <engine/backends/stb/asset_provider.h>
 
+#include <engine/render/frame_controller.h>
 #include <engine/render/renderer.h>
 
 #include <engine/resource/resource_manager.h>
@@ -37,8 +38,14 @@ int main() {
         .window = window,
     };
 
+    engine::FrameController frameController(backend);
     engine::Renderer renderer(backend);
     engine::ResourceManager resourceManager(backend);
+
+    backend::Camera2D camera;
+
+    frameController.setCamera(camera);
+    frameController.timer().setLimit(165);
 
     engine::Sound intro = resourceManager.createSound({"/home/jannik/Downloads", "intro.wav"});
     engine::Font font = resourceManager.createFont({"/usr/share/fonts/liberation", "LiberationSans-Regular.ttf"}, 24);
@@ -48,46 +55,31 @@ int main() {
     audioDevice.setAudio(voice, intro.audio());
     audioDevice.play(voice);
 
-    util::Timer<std::chrono::steady_clock> timer;
-    timer.setLimit(165);
-
-    backend::Camera2D camera;
-
     math::Vec2 playerPosition = math::Vec2::Zero();
 
-    timer.start();
+    frameController.timer().start();
     while (!window.shouldClose()) {
-        float dt = timer.tick();
+        frameController.execute(
+            [&](float dt) {
+                if (inputProvider.isKeyDown(backend::Key::W)) playerPosition.y += 10 * dt;
+                if (inputProvider.isKeyDown(backend::Key::S)) playerPosition.y -= 10 * dt;
+                if (inputProvider.isKeyDown(backend::Key::A)) playerPosition.x -= 10 * dt;
+                if (inputProvider.isKeyDown(backend::Key::D)) playerPosition.x += 10 * dt;
 
-        window.pollEvents();
+                camera.position = playerPosition;
+            },
+            [&](float dt) {
+                renderer.clear(math::Color::White);
+            },
+            [&](float dt) {
+                renderer.drawRect(math::Vec2::Zero(), math::Vec2::One(), math::Color::Blue);
+                renderer.drawTexture(rat, playerPosition, {1.0f, 1.5f});
+                renderer.drawText(font, "playa", {playerPosition.x, playerPosition.y + 1.0f}, 24, math::Color::Black, true);
+            },
+            [&](float dt) {
 
-        if (inputProvider.isKeyDown(backend::Key::W)) playerPosition.y += 10 * dt;
-        if (inputProvider.isKeyDown(backend::Key::S)) playerPosition.y -= 10 * dt;
-        if (inputProvider.isKeyDown(backend::Key::A)) playerPosition.x -= 10 * dt;
-        if (inputProvider.isKeyDown(backend::Key::D)) playerPosition.x += 10 * dt;
-
-        camera.position = playerPosition;
-
-        lowLevelRenderer.beginFrame();
-        renderer.clear(math::Color::White);
-
-        lowLevelRenderer.beginWorld(camera);
-
-        renderer.drawRect(math::Vec2::Zero(), math::Vec2::One(), math::Color::Blue);
-
-        renderer.drawTexture(rat, playerPosition, {1.0f, 1.5f});
-        renderer.drawText(font, "playa", {playerPosition.x, playerPosition.y + 1.0f}, 24, math::Color::Black, true);
-
-        lowLevelRenderer.endWorld();
-
-        lowLevelRenderer.beginUI();
-
-        lowLevelRenderer.endUI();
-        lowLevelRenderer.endFrame();
-
-        timer.waitForLimit();
-
-        std::cout << timer.getRate() << " fps\n";
+            }
+        );
     }
 
     return 0;
