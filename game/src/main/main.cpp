@@ -12,6 +12,8 @@
 
 #include <engine/backends/stb/asset_provider.h>
 
+#include <engine/input/input_handler.h>
+
 #include <engine/render/frame_controller.h>
 #include <engine/render/renderer.h>
 
@@ -22,6 +24,15 @@
 #include <engine/util/timer.h>
 
 #include <iostream>
+
+enum class Action {
+    Up = 0,
+    Down,
+    Left,
+    Right,
+
+    Count
+};
 
 int main() {
     backend::GLFWWindow window(100, 100, "SWINGALING");
@@ -41,9 +52,15 @@ int main() {
     };
 
     engine::FrameController frameController(backend);
+    engine::InputHandler<Action> input(backend);
     engine::Renderer renderer(backend);
     engine::ResourceManager resourceManager(backend);
     engine::AudioDevice audio(backend);
+
+    input.setKeybind(Action::Up, engine::Key::W);
+    input.setKeybind(Action::Down, engine::Key::S);
+    input.setKeybind(Action::Left, engine::Key::A);
+    input.setKeybind(Action::Right, engine::Key::D);
 
     backend::Camera2D camera;
 
@@ -63,10 +80,12 @@ int main() {
     while (!window.shouldClose()) {
         frameController.execute(
             [&](float dt) {
-                if (inputProvider.isKeyDown(backend::Key::W)) playerPosition.y += 10 * dt;
-                if (inputProvider.isKeyDown(backend::Key::S)) playerPosition.y -= 10 * dt;
-                if (inputProvider.isKeyDown(backend::Key::A)) playerPosition.x -= 10 * dt;
-                if (inputProvider.isKeyDown(backend::Key::D)) playerPosition.x += 10 * dt;
+                input.update();
+
+                if (input.isDown(Action::Up)) playerPosition.y += 10.0f * dt;
+                if (input.isDown(Action::Down)) playerPosition.y -= 10.0f * dt;
+                if (input.isDown(Action::Left)) playerPosition.x -= 10.0f * dt;
+                if (input.isDown(Action::Right)) playerPosition.x += 10.0f * dt;
 
                 camera.position = playerPosition;
 
