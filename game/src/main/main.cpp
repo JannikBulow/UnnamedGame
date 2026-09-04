@@ -12,6 +12,8 @@
 
 #include <engine/backends/stb/asset_provider.h>
 
+#include <engine/render/renderer.h>
+
 #include <engine/resource/resource_manager.h>
 
 #include <engine/util/timer.h>
@@ -22,7 +24,7 @@ int main() {
     backend::GLFWWindow window(100, 100, "SWINGALING");
     backend::GLFWInputProvider inputProvider(window);
     backend::OpenGLGraphicsDevice device;
-    backend::OpenGLRenderer renderer(device, window);
+    backend::OpenGLRenderer lowLevelRenderer(device, window);
     backend::StbAssetProvider assetProvider;
     backend::MiniaudioAudioDevice audioDevice;
 
@@ -31,10 +33,11 @@ int main() {
         .audio = audioDevice,
         .gpu = device,
         .inputProvider = inputProvider,
-        .renderer = renderer,
+        .renderer = lowLevelRenderer,
         .window = window,
     };
 
+    engine::Renderer renderer(backend);
     engine::ResourceManager resourceManager(backend);
 
     engine::Sound intro = resourceManager.createSound({"/home/jannik/Downloads", "intro.wav"});
@@ -65,40 +68,22 @@ int main() {
 
         camera.position = playerPosition;
 
-        renderer.beginFrame();
-        renderer.clearScreen(math::Color::White);
+        lowLevelRenderer.beginFrame();
+        renderer.clear(math::Color::White);
 
-        renderer.beginWorld(camera);
+        lowLevelRenderer.beginWorld(camera);
 
-        renderer.drawRect({
-            .position = math::Vec2::Zero(),
-            .size = math::Vec2::One(),
-            .color = math::Color::Blue
-        });
+        renderer.drawRect(math::Vec2::Zero(), math::Vec2::One(), math::Color::Blue);
 
-        renderer.drawTexture({
-            .texture = rat.handle(),
-            .position = playerPosition,
-            .size = {1, 1.5},
-            .color = math::Color::White
-        });
+        renderer.drawTexture(rat, playerPosition, {1.0f, 1.5f});
+        renderer.drawText(font, "playa", {playerPosition.x, playerPosition.y + 1.0f}, 24, math::Color::Black, true);
 
-        renderer.drawText({
-            .texture = font.texture(),
-            .font = font.font(),
-            .text = "playa",
-            .fontSize = 24.0f,
-            .position = {playerPosition.x, playerPosition.y + 1.0f},
-            .color = math::Color::Black,
-            .centerOrigin = true
-        });
+        lowLevelRenderer.endWorld();
 
-        renderer.endWorld();
+        lowLevelRenderer.beginUI();
 
-        renderer.beginUI();
-
-        renderer.endUI();
-        renderer.endFrame();
+        lowLevelRenderer.endUI();
+        lowLevelRenderer.endFrame();
 
         timer.waitForLimit();
 

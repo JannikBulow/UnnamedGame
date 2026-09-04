@@ -83,6 +83,8 @@ set(SOURCES
 
     src/backends/stb/asset_provider.cpp
 
+    src/render/renderer.cpp
+
     src/resource/font.cpp
     src/resource/resource_manager.cpp
     src/resource/sound.cpp
@@ -111,6 +113,8 @@ set(HEADERS
     include/engine/backends/opengl/shader_programs.h
 
     include/engine/backends/stb/asset_provider.h
+
+    include/engine/render/renderer.h
 
     include/engine/resource/font.h
     include/engine/resource/resource_manager.h
