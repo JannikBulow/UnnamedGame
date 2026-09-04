@@ -114,6 +114,7 @@ set(HEADERS
 
     include/engine/backends/stb/asset_provider.h
 
+    include/engine/render/camera.h
     include/engine/render/renderer.h
 
     include/engine/resource/font.h
