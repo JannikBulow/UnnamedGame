@@ -118,6 +118,8 @@ set(HEADERS
 
     include/engine/backends/stb/asset_provider.h
 
+    include/engine/input/input_handler.h
+
     include/engine/render/camera.h
     include/engine/render/frame_controller.h
     include/engine/render/renderer.h
