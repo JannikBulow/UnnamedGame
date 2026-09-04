@@ -26,9 +26,6 @@ int main() {
     backend::StbAssetProvider assetProvider;
     backend::MiniaudioAudioDevice audioDevice;
 
-    backend::Font font = assetProvider.loadFont("/usr/share/fonts/liberation/LiberationSans-Regular.ttf", 24, nullptr, 0);
-    backend::TextureHandle fontTexture = device.createTexture(font.atlas);
-
     backend::Backend backend = {
         .assetProvider = assetProvider,
         .audio = audioDevice,
@@ -41,6 +38,7 @@ int main() {
     engine::ResourceManager resourceManager(backend);
 
     engine::Sound intro = resourceManager.createSound({"/home/jannik/Downloads", "intro.wav"});
+    engine::Font font = resourceManager.createFont({"/usr/share/fonts/liberation", "LiberationSans-Regular.ttf"}, 24);
     engine::Texture rat = resourceManager.createTexture({"/home/jannik/Downloads", "rat.png"});
 
     backend::AudioVoiceHandle voice = audioDevice.createVoice();
@@ -86,8 +84,8 @@ int main() {
         });
 
         renderer.drawText({
-            .texture = fontTexture,
-            .font = font,
+            .texture = font.texture(),
+            .font = font.font(),
             .text = "playa",
             .fontSize = 24.0f,
             .position = {playerPosition.x, playerPosition.y + 1.0f},
@@ -106,10 +104,6 @@ int main() {
 
         std::cout << timer.getRate() << " fps\n";
     }
-
-    device.destroyTexture(fontTexture);
-
-    assetProvider.unloadFont(font);
 
     return 0;
 }
