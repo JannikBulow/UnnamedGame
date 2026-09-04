@@ -83,6 +83,7 @@ set(SOURCES
 
     src/backends/stb/asset_provider.cpp
 
+    src/resource/font.cpp
     src/resource/resource_manager.cpp
     src/resource/sound.cpp
     src/resource/texture.cpp
