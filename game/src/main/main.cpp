@@ -17,6 +17,8 @@
 
 #include <engine/resource/resource_manager.h>
 
+#include <engine/sound/audio_device.h>
+
 #include <engine/util/timer.h>
 
 #include <iostream>
@@ -41,6 +43,7 @@ int main() {
     engine::FrameController frameController(backend);
     engine::Renderer renderer(backend);
     engine::ResourceManager resourceManager(backend);
+    engine::AudioDevice audio(backend);
 
     backend::Camera2D camera;
 
@@ -51,9 +54,7 @@ int main() {
     engine::Font font = resourceManager.createFont({"/usr/share/fonts/liberation", "LiberationSans-Regular.ttf"}, 24);
     engine::Texture rat = resourceManager.createTexture({"/home/jannik/Downloads", "rat.png"});
 
-    backend::AudioVoiceHandle voice = audioDevice.createVoice();
-    audioDevice.setAudio(voice, intro.audio());
-    audioDevice.play(voice);
+    audio.play(intro);
 
     math::Vec2 playerPosition = math::Vec2::Zero();
 
@@ -67,6 +68,8 @@ int main() {
                 if (inputProvider.isKeyDown(backend::Key::D)) playerPosition.x += 10 * dt;
 
                 camera.position = playerPosition;
+
+                audio.update(dt);
             },
             [&](float dt) {
                 renderer.clear(math::Color::White);
